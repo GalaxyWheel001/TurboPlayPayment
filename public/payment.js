@@ -128,60 +128,80 @@ function initializePaymentPage() {
         });
     }
     
-    // Настройка селектора языка - с задержкой для мобильных и Telegram Mini App
-    setTimeout(() => {
+    // Настройка селектора языка - используем делегирование событий для Telegram Mini App
+    function setupLanguageSelector() {
         const languageSelector = document.getElementById('languageSelector');
-        if (languageSelector) {
-            console.log('Setting up language selector');
-            
-            // Автоопределение языка из Telegram или сохраненный выбор
-            const savedLang = localStorage.getItem('selectedLanguage');
-            const userLang = user.language_code?.split('-')[0] || 'en';
-            const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-            const detectedLang = langMap[userLang] || 'en';
-            languageSelector.value = savedLang || getCurrentLanguage() || detectedLang;
-            setLanguage(languageSelector.value);
-            
-            // Функция для обработки изменения языка
-            const handleLanguageChange = function(e) {
-                const lang = e.target.value;
-                console.log('Language selector changed to:', lang);
-                setLanguage(lang);
-                localStorage.setItem('selectedLanguage', lang);
-                
-                // Haptic feedback в Telegram Mini App
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-            };
-            
-            // Удаляем старые обработчики если есть
-            const newSelector = languageSelector.cloneNode(true);
-            languageSelector.parentNode.replaceChild(newSelector, languageSelector);
-            
-            // Добавляем обработчики событий (с задержкой для Telegram Mini App)
-            setTimeout(() => {
-                const selector = document.getElementById('languageSelector');
-                if (selector) {
-                    // Обработчик change для всех устройств
-                    selector.addEventListener('change', handleLanguageChange, { passive: true });
-                    console.log('Language selector change handler added');
-                    
-                    // Дополнительные обработчики для мобильных и Telegram
-                    selector.addEventListener('input', handleLanguageChange, { passive: true });
-                    
-                    // Также добавляем onchange как запасной вариант
-                    selector.setAttribute('onchange', 'if (typeof setLanguage === "function") { const lang = this.value; setLanguage(lang); localStorage.setItem("selectedLanguage", lang); console.log("Language changed via onchange:", lang); } else if (typeof window.setLanguage === "function") { const lang = this.value; window.setLanguage(lang); localStorage.setItem("selectedLanguage", lang); }');
-                    
-                    console.log('Language selector setup complete');
-                } else {
-                    console.error('Language selector not found after recreation');
-                }
-            }, 50);
-        } else {
+        if (!languageSelector) {
             console.warn('Language selector not found');
+            return;
         }
-    }, 200);
+        
+        console.log('Setting up language selector');
+        
+        // Автоопределение языка из Telegram или сохраненный выбор
+        const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('paymentLanguage');
+        const userLang = user.language_code?.split('-')[0] || 'en';
+        const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
+        const detectedLang = langMap[userLang] || 'en';
+        const currentLang = savedLang || getCurrentLanguage() || detectedLang;
+        languageSelector.value = currentLang;
+        setLanguage(currentLang);
+        
+        // Функция для обработки изменения языка
+        const handleLanguageChange = function(e) {
+            const lang = e.target ? e.target.value : e;
+            console.log('Language selector changed to:', lang);
+            setLanguage(lang);
+            localStorage.setItem('selectedLanguage', lang);
+            localStorage.setItem('paymentLanguage', lang);
+            
+            // Haptic feedback в Telegram Mini App
+            if (tg && tg.HapticFeedback) {
+                try {
+                    tg.HapticFeedback.impactOccurred('light');
+                } catch (err) {
+                    console.warn('Haptic feedback failed:', err);
+                }
+            }
+        };
+        
+        // Удаляем все старые обработчики
+        const newSelector = languageSelector.cloneNode(true);
+        languageSelector.parentNode.replaceChild(newSelector, languageSelector);
+        
+        // Получаем новый элемент
+        const selector = document.getElementById('languageSelector');
+        if (!selector) {
+            console.error('Language selector not found after recreation');
+            return;
+        }
+        
+        // Добавляем обработчики с использованием capture для Telegram Mini App
+        selector.addEventListener('change', handleLanguageChange, true);
+        selector.addEventListener('input', handleLanguageChange, true);
+        selector.addEventListener('click', function(e) {
+            console.log('Language selector clicked');
+        }, true);
+        
+        // Также добавляем onchange как запасной вариант
+        selector.setAttribute('onchange', 'if (typeof window.setLanguage === "function") { const lang = this.value; window.setLanguage(lang); localStorage.setItem("selectedLanguage", lang); localStorage.setItem("paymentLanguage", lang); console.log("Language changed via onchange:", lang); }');
+        
+        // Делегирование событий на родительском элементе
+        const parent = selector.parentElement;
+        if (parent) {
+            parent.addEventListener('change', function(e) {
+                if (e.target && e.target.id === 'languageSelector') {
+                    console.log('Language changed via delegated handler');
+                    handleLanguageChange(e);
+                }
+            }, true);
+        }
+        
+        console.log('Language selector setup complete');
+    }
+    
+    // Инициализируем с задержкой для Telegram Mini App
+    setTimeout(setupLanguageSelector, 300);
 
     // Обновить переводы
     updateTranslations();
@@ -1072,8 +1092,7 @@ window.openLinkDirect = openLinkDirect;
 
 // Setup Dark Mode
 function setupDarkMode() {
-    // Задержка для мобильных устройств и Telegram Mini App
-    setTimeout(() => {
+    function setupThemeToggle() {
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
@@ -1089,100 +1108,118 @@ function setupDarkMode() {
         applyTheme(theme);
         
         // Theme toggle handler - улучшенная версия для Telegram Mini App
-        if (themeToggle) {
-            // Функция для переключения темы
-            const toggleTheme = () => {
-                const currentTheme = html.getAttribute('data-theme') || 'light';
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                console.log('Toggling theme from', currentTheme, 'to', newTheme);
-                applyTheme(newTheme);
-                localStorage.setItem('theme', newTheme);
-                
-                // Haptic feedback в Telegram Mini App
-                if (tg && tg.HapticFeedback) {
-                    try {
-                        tg.HapticFeedback.impactOccurred('light');
-                    } catch (e) {
-                        console.warn('Haptic feedback failed:', e);
-                    }
-                }
-            };
-            
-            // Удаляем все старые обработчики
-            const newToggle = themeToggle.cloneNode(true);
-            themeToggle.parentNode.replaceChild(newToggle, themeToggle);
-            
-            // Получаем новый элемент с задержкой для Telegram Mini App
-            setTimeout(() => {
-                const toggle = document.getElementById('themeToggle');
-                if (toggle) {
-                    console.log('Theme toggle recreated, setting up handlers');
-                    
-                    // Универсальный обработчик click - работает и на десктопе, и на мобильных
-                    toggle.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Theme toggle clicked');
-                        toggleTheme();
-                    }, { passive: false });
-                    
-                    // Обработчик для touch событий (для Telegram Mini App)
-                    let touchStartTime = 0;
-                    let touchMoved = false;
-                    
-                    toggle.addEventListener('touchstart', function(e) {
-                        touchStartTime = Date.now();
-                        touchMoved = false;
-                        toggle.classList.add('active');
-                        console.log('Theme toggle touch start');
-                    }, { passive: true });
-                    
-                    toggle.addEventListener('touchmove', function() {
-                        touchMoved = true;
-                    }, { passive: true });
-                    
-                    toggle.addEventListener('touchend', function(e) {
-                        const touchDuration = Date.now() - touchStartTime;
-                        toggle.classList.remove('active');
-                        
-                        // Если касание было коротким и без движения (не свайп), переключаем тему
-                        if (!touchMoved && touchDuration < 300) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('Theme toggle touch end (short tap)');
-                            toggleTheme();
-                        }
-                    }, { passive: false });
-                    
-                    toggle.addEventListener('touchcancel', function() {
-                        toggle.classList.remove('active');
-                        touchMoved = false;
-                    });
-                    
-                    // Также добавляем onclick атрибут как запасной вариант
-                    toggle.setAttribute('onclick', 'if (typeof window.applyTheme === "function") { const html = document.documentElement; const currentTheme = html.getAttribute("data-theme") || "light"; const newTheme = currentTheme === "dark" ? "light" : "dark"; window.applyTheme(newTheme); localStorage.setItem("theme", newTheme); console.log("Theme changed via onclick:", newTheme); }');
-                    
-                    // Делаем кнопку явно кликабельной
-                    toggle.style.pointerEvents = 'auto';
-                    toggle.style.cursor = 'pointer';
-                    toggle.style.touchAction = 'manipulation';
-                    
-                    console.log('Theme toggle handlers setup complete');
-                } else {
-                    console.error('Theme toggle not found after recreation');
-                }
-            }, 50);
-        } else {
+        if (!themeToggle) {
             console.warn('Theme toggle not found');
+            return;
         }
         
-        // Listen for system theme changes
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                applyTheme(e.matches ? 'dark' : 'light');
+        // Функция для переключения темы
+        const toggleTheme = () => {
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            console.log('Toggling theme from', currentTheme, 'to', newTheme);
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Haptic feedback в Telegram Mini App
+            if (tg && tg.HapticFeedback) {
+                try {
+                    tg.HapticFeedback.impactOccurred('light');
+                } catch (e) {
+                    console.warn('Haptic feedback failed:', e);
+                }
             }
-        });
-    }, 200);
+        };
+        
+        // Удаляем все старые обработчики
+        const newToggle = themeToggle.cloneNode(true);
+        themeToggle.parentNode.replaceChild(newToggle, themeToggle);
+        
+        // Получаем новый элемент
+        const toggle = document.getElementById('themeToggle');
+        if (!toggle) {
+            console.error('Theme toggle not found after recreation');
+            return;
+        }
+        
+        console.log('Theme toggle recreated, setting up handlers');
+        
+        // Универсальный обработчик click с capture для Telegram Mini App
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Theme toggle clicked');
+            toggleTheme();
+        }, true);
+        
+        // Обработчик для touch событий (для Telegram Mini App)
+        let touchStartTime = 0;
+        let touchMoved = false;
+        
+        toggle.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            touchMoved = false;
+            toggle.classList.add('active');
+            console.log('Theme toggle touch start');
+        }, { passive: true, capture: true });
+        
+        toggle.addEventListener('touchmove', function() {
+            touchMoved = true;
+        }, { passive: true, capture: true });
+        
+        toggle.addEventListener('touchend', function(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            toggle.classList.remove('active');
+            
+            // Если касание было коротким и без движения (не свайп), переключаем тему
+            if (!touchMoved && touchDuration < 300) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Theme toggle touch end (short tap)');
+                toggleTheme();
+            }
+        }, { passive: false, capture: true });
+        
+        toggle.addEventListener('touchcancel', function() {
+            toggle.classList.remove('active');
+            touchMoved = false;
+        }, { capture: true });
+        
+        // Также добавляем onclick атрибут как запасной вариант
+        toggle.setAttribute('onclick', 'if (typeof window.applyTheme === "function") { const html = document.documentElement; const currentTheme = html.getAttribute("data-theme") || "light"; const newTheme = currentTheme === "dark" ? "light" : "dark"; window.applyTheme(newTheme); localStorage.setItem("theme", newTheme); console.log("Theme changed via onclick:", newTheme); }');
+        
+        // Делаем кнопку явно кликабельной
+        toggle.style.pointerEvents = 'auto';
+        toggle.style.cursor = 'pointer';
+        toggle.style.touchAction = 'manipulation';
+        toggle.style.userSelect = 'none';
+        toggle.style.webkitUserSelect = 'none';
+        
+        // Делегирование событий на родительском элементе
+        const parent = toggle.parentElement;
+        if (parent) {
+            parent.addEventListener('click', function(e) {
+                if (e.target && (e.target.id === 'themeToggle' || e.target.closest('#themeToggle'))) {
+                    console.log('Theme toggle clicked via delegated handler');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleTheme();
+                }
+            }, true);
+        }
+        
+        console.log('Theme toggle handlers setup complete');
+    }
+    
+    // Инициализируем с задержкой для Telegram Mini App
+    setTimeout(setupThemeToggle, 300);
+    
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+        }
+    });
 }
 
 // Apply theme
