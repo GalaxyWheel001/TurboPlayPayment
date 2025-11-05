@@ -308,7 +308,7 @@ async function createPayment(providerName = 'moonpay') {
         const data = await response.json();
         console.log('Payment response:', data); // Debug
 
-        if (data.success) {
+        if (data.success && data.paymentUrl) {
             showProgress(100, 'Payment created!');
             await delay(500);
             hideProgress();
@@ -316,11 +316,18 @@ async function createPayment(providerName = 'moonpay') {
             // Показываем только уведомление, модальное окно показывается только после успешной оплаты
             showToast(t('paymentCreated') || 'Payment created successfully!', 'success');
             
-            // Открыть ссылку на оплату - улучшенная версия для мобильных
-            openPaymentLink(data.paymentUrl);
+            // Проверяем наличие paymentUrl
+            console.log('Payment URL received:', data.paymentUrl);
+            
+            // Небольшая задержка перед открытием ссылки (для мобильных)
+            setTimeout(() => {
+                openPaymentLink(data.paymentUrl);
+            }, 300);
         } else {
             hideProgress();
-            showError(data.error || t('failedToCreate'));
+            const errorMsg = data.error || (data.success ? 'Payment URL not received' : t('failedToCreate'));
+            console.error('Payment creation failed:', errorMsg, data);
+            showError(errorMsg);
         }
     } catch (error) {
         console.error('Payment creation error:', error);
@@ -618,20 +625,90 @@ function openPaymentLink(url) {
         return;
     }
     
-    // Способ 1: Использовать Telegram Web App API (предпочтительно)
+    // Проверяем, что URL валидный
+    try {
+        new URL(url);
+    } catch (e) {
+        console.error('Invalid URL format:', url);
+        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        return;
+    }
+    
+    // Способ 1: Использовать Telegram Web App API (предпочтительно, только если доступен)
     if (tg && typeof tg.openLink === 'function') {
         try {
+            console.log('Attempting to open via tg.openLink');
             tg.openLink(url);
             console.log('Opened link via tg.openLink');
+            // Всегда показываем запасной вариант через небольшую задержку
+            setTimeout(() => {
+                console.log('Showing backup option in case tg.openLink failed');
+                tryMainButtonOrModal(url);
+            }, 2000);
             return;
         } catch (error) {
             console.warn('tg.openLink failed:', error);
+            // Продолжаем с альтернативными методами
         }
     }
     
-    // Способ 2: Попробовать открыть через window.location (для внешних ссылок)
+    // Если Telegram API недоступен (standalone режим), пробуем открыть сразу
+    // Но на мобильных браузерах window.open может быть заблокирован, поэтому показываем модальное окно
+    console.log('Telegram API not available, running in standalone mode');
+    
+    // Пробуем открыть через window.open (может не работать на мобильных без действия пользователя)
     try {
-        // Создаем временную ссылку и кликаем по ней
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (openedWindow && !openedWindow.closed) {
+            console.log('Opened link via window.open');
+            // Показываем модальное окно как запасной вариант
+            setTimeout(() => {
+                tryMainButtonOrModal(url);
+            }, 1500);
+            return;
+        } else {
+            console.log('window.open was blocked, showing modal');
+        }
+    } catch (error) {
+        console.warn('window.open failed:', error);
+    }
+    
+    // Если window.open заблокирован или не работает, сразу показываем модальное окно
+    // Это гарантирует, что пользователь сможет открыть ссылку по своему действию
+    tryMainButtonOrModal(url);
+}
+
+// Альтернативные методы открытия ссылки
+function tryAlternativeMethods(url) {
+    console.log('Trying alternative methods to open link:', url);
+    
+    // Способ 2: Попробовать открыть через window.open (более надежный для мобильных)
+    try {
+        console.log('Attempting window.open');
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        
+        // Проверяем, открылось ли окно (может быть заблокировано)
+        if (openedWindow && !openedWindow.closed) {
+            console.log('Opened link via window.open');
+            // Показываем запасной вариант на случай если не открылось
+            setTimeout(() => {
+                tryMainButtonOrModal(url);
+            }, 1500);
+            return;
+        } else {
+            console.warn('window.open was blocked or failed, trying temporary link');
+            tryTemporaryLink(url);
+        }
+    } catch (error) {
+        console.warn('window.open failed:', error);
+        tryTemporaryLink(url);
+    }
+}
+
+// Попробовать открыть через временную ссылку
+function tryTemporaryLink(url) {
+    try {
+        console.log('Attempting temporary link method');
         const link = document.createElement('a');
         link.href = url;
         link.target = '_blank';
@@ -639,7 +716,7 @@ function openPaymentLink(url) {
         link.style.display = 'none';
         document.body.appendChild(link);
         
-        // Пытаемся открыть
+        // Пытаемся открыть через программный клик
         const clickEvent = new MouseEvent('click', {
             view: window,
             bubbles: true,
@@ -647,17 +724,35 @@ function openPaymentLink(url) {
         });
         link.dispatchEvent(clickEvent);
         
+        // Также пытаемся через обычный click
+        try {
+            link.click();
+        } catch (e) {
+            console.warn('link.click() failed:', e);
+        }
+        
         // Удаляем ссылку через небольшую задержку
         setTimeout(() => {
-            document.body.removeChild(link);
-        }, 100);
+            if (link.parentNode) {
+                document.body.removeChild(link);
+            }
+        }, 500);
         
         console.log('Opened link via temporary link element');
-        return;
+        
+        // Даем время на открытие, если не сработает - покажем кнопку
+        setTimeout(() => {
+            tryMainButtonOrModal(url);
+        }, 1000);
+        
     } catch (error) {
         console.warn('Temporary link failed:', error);
+        tryMainButtonOrModal(url);
     }
-    
+}
+
+// Попробовать MainButton или модальное окно
+function tryMainButtonOrModal(url) {
     // Способ 3: Использовать MainButton от Telegram (если доступно)
     if (tg && tg.MainButton && typeof tg.MainButton.show === 'function') {
         try {
@@ -683,6 +778,7 @@ function openPaymentLink(url) {
     }
     
     // Способ 4: Показать модальное окно с кнопкой для открытия
+    console.log('Showing modal with payment link button');
     showPaymentLinkModal(url);
 }
 
