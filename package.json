@@ -1,0 +1,33 @@
+{
+  "name": "telegram-payment-gateway",
+  "version": "1.0.0",
+  "description": "Telegram Mini App Payment Gateway",
+  "main": "server-no-intermediary.js",
+  "scripts": {
+    "start": "node server-no-intermediary.js",
+    "start-direct": "node server-no-intermediary.js",
+    "dev": "nodemon server-no-intermediary.js",
+    "netlify:dev": "netlify dev",
+    "netlify:deploy": "netlify deploy",
+    "netlify:deploy:prod": "netlify deploy --prod"
+  },
+  "keywords": [
+    "telegram",
+    "payment",
+    "gateway",
+    "crypto"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "express-rate-limit": "^7.1.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
