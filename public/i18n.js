@@ -598,6 +598,7 @@ function getCurrentLanguage() {
 // Функция для установки языка
 function setLanguage(lang) {
     localStorage.setItem('paymentLanguage', lang);
+    localStorage.setItem('selectedLanguage', lang); // Дублируем для совместимости
     updateTranslations();
     
     // Обновить подсказки и опции после смены языка
@@ -608,6 +609,9 @@ function setLanguage(lang) {
         updateCryptoOptions();
     }
 }
+
+// Экспортируем функцию для использования в onchange атрибутах
+window.setLanguage = setLanguage;
 
 // Функция для обновления переводов на странице
 function updateTranslations() {

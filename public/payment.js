@@ -128,10 +128,12 @@ function initializePaymentPage() {
         });
     }
     
-    // Настройка селектора языка - с задержкой для мобильных
+    // Настройка селектора языка - с задержкой для мобильных и Telegram Mini App
     setTimeout(() => {
         const languageSelector = document.getElementById('languageSelector');
         if (languageSelector) {
+            console.log('Setting up language selector');
+            
             // Автоопределение языка из Telegram или сохраненный выбор
             const savedLang = localStorage.getItem('selectedLanguage');
             const userLang = user.language_code?.split('-')[0] || 'en';
@@ -140,33 +142,46 @@ function initializePaymentPage() {
             languageSelector.value = savedLang || getCurrentLanguage() || detectedLang;
             setLanguage(languageSelector.value);
             
+            // Функция для обработки изменения языка
+            const handleLanguageChange = function(e) {
+                const lang = e.target.value;
+                console.log('Language selector changed to:', lang);
+                setLanguage(lang);
+                localStorage.setItem('selectedLanguage', lang);
+                
+                // Haptic feedback в Telegram Mini App
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            };
+            
             // Удаляем старые обработчики если есть
             const newSelector = languageSelector.cloneNode(true);
             languageSelector.parentNode.replaceChild(newSelector, languageSelector);
             
-            // Добавляем обработчики событий для мобильных
-            const selector = document.getElementById('languageSelector');
-            if (selector) {
-                // Обработчик change для всех устройств
-                selector.addEventListener('change', function(e) {
-                    const lang = e.target.value;
-                    setLanguage(lang);
-                    localStorage.setItem('selectedLanguage', lang);
-                    console.log('Language changed to:', lang);
-                });
-                
-                // Дополнительные обработчики для мобильных
-                selector.addEventListener('touchstart', function(e) {
-                    e.stopPropagation();
-                });
-                selector.addEventListener('touchend', function(e) {
-                    e.stopPropagation();
-                });
-            }
+            // Добавляем обработчики событий (с задержкой для Telegram Mini App)
+            setTimeout(() => {
+                const selector = document.getElementById('languageSelector');
+                if (selector) {
+                    // Обработчик change для всех устройств
+                    selector.addEventListener('change', handleLanguageChange, { passive: true });
+                    console.log('Language selector change handler added');
+                    
+                    // Дополнительные обработчики для мобильных и Telegram
+                    selector.addEventListener('input', handleLanguageChange, { passive: true });
+                    
+                    // Также добавляем onchange как запасной вариант
+                    selector.setAttribute('onchange', 'if (typeof setLanguage === "function") { const lang = this.value; setLanguage(lang); localStorage.setItem("selectedLanguage", lang); console.log("Language changed via onchange:", lang); } else if (typeof window.setLanguage === "function") { const lang = this.value; window.setLanguage(lang); localStorage.setItem("selectedLanguage", lang); }');
+                    
+                    console.log('Language selector setup complete');
+                } else {
+                    console.error('Language selector not found after recreation');
+                }
+            }, 50);
         } else {
             console.warn('Language selector not found');
         }
-    }, 100);
+    }, 200);
 
     // Обновить переводы
     updateTranslations();
@@ -1057,11 +1072,13 @@ window.openLinkDirect = openLinkDirect;
 
 // Setup Dark Mode
 function setupDarkMode() {
-    // Задержка для мобильных устройств
+    // Задержка для мобильных устройств и Telegram Mini App
     setTimeout(() => {
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
         const html = document.documentElement;
+        
+        console.log('Setting up dark mode, themeToggle found:', !!themeToggle);
         
         // Get saved theme or detect system preference
         const savedTheme = localStorage.getItem('theme');
@@ -1071,19 +1088,23 @@ function setupDarkMode() {
         // Apply theme
         applyTheme(theme);
         
-        // Theme toggle handler - упрощенная версия для мобильных
+        // Theme toggle handler - улучшенная версия для Telegram Mini App
         if (themeToggle) {
             // Функция для переключения темы
             const toggleTheme = () => {
                 const currentTheme = html.getAttribute('data-theme') || 'light';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                console.log('Toggling theme from', currentTheme, 'to', newTheme);
                 applyTheme(newTheme);
                 localStorage.setItem('theme', newTheme);
-                console.log('Theme changed to:', newTheme);
                 
-                // Haptic feedback
+                // Haptic feedback в Telegram Mini App
                 if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
+                    try {
+                        tg.HapticFeedback.impactOccurred('light');
+                    } catch (e) {
+                        console.warn('Haptic feedback failed:', e);
+                    }
                 }
             };
             
@@ -1091,39 +1112,66 @@ function setupDarkMode() {
             const newToggle = themeToggle.cloneNode(true);
             themeToggle.parentNode.replaceChild(newToggle, themeToggle);
             
-            // Получаем новый элемент
-            const toggle = document.getElementById('themeToggle');
-            if (toggle) {
-                // Универсальный обработчик - работает и на click, и на touch
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleTheme();
-                });
-                
-                // Дополнительный обработчик для touch (на случай если click не сработает)
-                let touchStartTime = 0;
-                toggle.addEventListener('touchstart', function(e) {
-                    touchStartTime = Date.now();
-                    toggle.classList.add('active');
-                }, { passive: true });
-                
-                toggle.addEventListener('touchend', function(e) {
-                    const touchDuration = Date.now() - touchStartTime;
-                    toggle.classList.remove('active');
+            // Получаем новый элемент с задержкой для Telegram Mini App
+            setTimeout(() => {
+                const toggle = document.getElementById('themeToggle');
+                if (toggle) {
+                    console.log('Theme toggle recreated, setting up handlers');
                     
-                    // Если касание было коротким (не свайп), переключаем тему
-                    if (touchDuration < 300) {
+                    // Универсальный обработчик click - работает и на десктопе, и на мобильных
+                    toggle.addEventListener('click', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
+                        console.log('Theme toggle clicked');
                         toggleTheme();
-                    }
-                }, { passive: false });
-                
-                toggle.addEventListener('touchcancel', function() {
-                    toggle.classList.remove('active');
-                });
-            }
+                    }, { passive: false });
+                    
+                    // Обработчик для touch событий (для Telegram Mini App)
+                    let touchStartTime = 0;
+                    let touchMoved = false;
+                    
+                    toggle.addEventListener('touchstart', function(e) {
+                        touchStartTime = Date.now();
+                        touchMoved = false;
+                        toggle.classList.add('active');
+                        console.log('Theme toggle touch start');
+                    }, { passive: true });
+                    
+                    toggle.addEventListener('touchmove', function() {
+                        touchMoved = true;
+                    }, { passive: true });
+                    
+                    toggle.addEventListener('touchend', function(e) {
+                        const touchDuration = Date.now() - touchStartTime;
+                        toggle.classList.remove('active');
+                        
+                        // Если касание было коротким и без движения (не свайп), переключаем тему
+                        if (!touchMoved && touchDuration < 300) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Theme toggle touch end (short tap)');
+                            toggleTheme();
+                        }
+                    }, { passive: false });
+                    
+                    toggle.addEventListener('touchcancel', function() {
+                        toggle.classList.remove('active');
+                        touchMoved = false;
+                    });
+                    
+                    // Также добавляем onclick атрибут как запасной вариант
+                    toggle.setAttribute('onclick', 'if (typeof window.applyTheme === "function") { const html = document.documentElement; const currentTheme = html.getAttribute("data-theme") || "light"; const newTheme = currentTheme === "dark" ? "light" : "dark"; window.applyTheme(newTheme); localStorage.setItem("theme", newTheme); console.log("Theme changed via onclick:", newTheme); }');
+                    
+                    // Делаем кнопку явно кликабельной
+                    toggle.style.pointerEvents = 'auto';
+                    toggle.style.cursor = 'pointer';
+                    toggle.style.touchAction = 'manipulation';
+                    
+                    console.log('Theme toggle handlers setup complete');
+                } else {
+                    console.error('Theme toggle not found after recreation');
+                }
+            }, 50);
         } else {
             console.warn('Theme toggle not found');
         }
@@ -1134,7 +1182,7 @@ function setupDarkMode() {
                 applyTheme(e.matches ? 'dark' : 'light');
             }
         });
-    }, 100);
+    }, 200);
 }
 
 // Apply theme
@@ -1185,6 +1233,9 @@ function applyTheme(theme) {
         }
     });
 }
+
+// Экспортируем функцию для использования в onclick атрибутах
+window.applyTheme = applyTheme;
 
 // ============================================
 // PROVIDER LOGOS
