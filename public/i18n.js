@@ -93,7 +93,16 @@ const translations = {
         toggleTheme: "Toggle theme",
         
         // Payment Guarantee
-        paymentGuarantee: "Your payment is protected by industry-leading security"
+        paymentGuarantee: "Your payment is protected by industry-leading security",
+        
+        // Payment Link
+        paymentLinkReady: "Payment Link Ready",
+        clickToOpenPayment: "Click the button below to open the payment page",
+        openPaymentPage: "Open Payment Page",
+        openPaymentLink: "Open Payment Link",
+        orCopyLink: "Or copy this link:",
+        pleaseOpenLink: "Please open the link manually",
+        invalidPaymentUrl: "Invalid payment URL"
     },
     ru: {
         // Header
@@ -188,7 +197,16 @@ const translations = {
         toggleTheme: "Переключить тему",
         
         // Payment Guarantee
-        paymentGuarantee: "Ваш платеж защищен лидирующей в отрасли безопасностью"
+        paymentGuarantee: "Ваш платеж защищен лидирующей в отрасли безопасностью",
+        
+        // Payment Link
+        paymentLinkReady: "Ссылка на оплату готова",
+        clickToOpenPayment: "Нажмите кнопку ниже, чтобы открыть страницу оплаты",
+        openPaymentPage: "Открыть страницу оплаты",
+        openPaymentLink: "Открыть ссылку на оплату",
+        orCopyLink: "Или скопируйте эту ссылку:",
+        pleaseOpenLink: "Пожалуйста, откройте ссылку вручную",
+        invalidPaymentUrl: "Неверная ссылка на оплату"
     },
     tr: {
         // Header

@@ -226,12 +226,8 @@ async function createPayment(providerName = 'moonpay') {
             // Показываем только уведомление, модальное окно показывается только после успешной оплаты
             showToast(t('paymentCreated') || 'Payment created successfully!', 'success');
             
-            // Открыть ссылку на оплату
-            if (tg && tg.openLink) {
-                tg.openLink(data.paymentUrl);
-            } else {
-                window.open(data.paymentUrl, '_blank');
-            }
+            // Открыть ссылку на оплату - улучшенная версия для мобильных
+            openPaymentLink(data.paymentUrl);
         } else {
             hideProgress();
             showError(data.error || t('failedToCreate'));
@@ -514,6 +510,123 @@ function showError(message) {
     // Haptic feedback
     if (tg && tg.HapticFeedback) {
         tg.HapticFeedback.notificationOccurred('error');
+    }
+}
+
+// ============================================
+// OPEN PAYMENT LINK (MOBILE FIX)
+// ============================================
+
+// Улучшенная функция для открытия ссылки на оплату на мобильных устройствах
+function openPaymentLink(url) {
+    console.log('Opening payment link:', url); // Debug
+    
+    // Проверка на валидность URL
+    if (!url || typeof url !== 'string') {
+        console.error('Invalid payment URL:', url);
+        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        return;
+    }
+    
+    // Способ 1: Использовать Telegram Web App API (предпочтительно)
+    if (tg && typeof tg.openLink === 'function') {
+        try {
+            tg.openLink(url);
+            console.log('Opened link via tg.openLink');
+            return;
+        } catch (error) {
+            console.warn('tg.openLink failed:', error);
+        }
+    }
+    
+    // Способ 2: Использовать MainButton от Telegram (если доступно)
+    if (tg && tg.MainButton && typeof tg.MainButton.show === 'function') {
+        try {
+            tg.MainButton.setText(t('openPaymentLink') || 'Open Payment Link');
+            tg.MainButton.show();
+            tg.MainButton.onClick(() => {
+                tg.openLink(url);
+                tg.MainButton.hide();
+            });
+            console.log('Using MainButton for payment link');
+            return;
+        } catch (error) {
+            console.warn('MainButton setup failed:', error);
+        }
+    }
+    
+    // Способ 3: Показать модальное окно с кнопкой для открытия
+    showPaymentLinkModal(url);
+}
+
+// Показать модальное окно с кнопкой для открытия ссылки
+function showPaymentLinkModal(url) {
+    const modal = document.getElementById('paymentResult');
+    const resultContent = document.getElementById('resultContent');
+    
+    if (!modal || !resultContent) {
+        // Если модальное окно не найдено, используем прямой способ
+        openLinkDirect(url);
+        return;
+    }
+    
+    resultContent.className = 'result-content info';
+    
+    // Создаем элементы безопасно
+    resultContent.innerHTML = `
+        <div class="success-icon">🔗</div>
+        <h3>${escapeHtml(t('paymentLinkReady') || 'Payment Link Ready')}</h3>
+        <p class="result-message">${escapeHtml(t('clickToOpenPayment') || 'Click the button below to open the payment page')}</p>
+        <button class="btn btn-primary" id="openPaymentLinkBtn" style="margin-top: 20px;">
+            ${escapeHtml(t('openPaymentPage') || 'Open Payment Page')}
+        </button>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+            ${escapeHtml(t('orCopyLink') || 'Or copy this link:')}
+        </p>
+        <input type="text" id="paymentLinkInput" value="${escapeHtml(url)}" readonly style="width: 100%; padding: 8px; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 12px;" onclick="this.select();">
+    `;
+    
+    // Добавляем обработчик события для кнопки
+    const openBtn = document.getElementById('openPaymentLinkBtn');
+    if (openBtn) {
+        openBtn.addEventListener('click', () => {
+            openLinkDirect(url);
+            modal.style.display = 'none';
+        });
+    }
+    
+    modal.style.display = 'flex';
+}
+
+// Прямое открытие ссылки (последний способ)
+function openLinkDirect(url) {
+    console.log('Opening link directly:', url);
+    
+    // Попробовать несколько способов
+    try {
+        // Способ 1: Через location (работает всегда, но открывает в том же окне)
+        // Это запасной вариант, если все остальное не работает
+        
+        // Способ 2: Создать временную ссылку и кликнуть по ней
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        console.log('Opened link via temporary <a> element');
+        
+        // Способ 3: Если не сработало, использовать location.href через небольшую задержку
+        setTimeout(() => {
+            // Если ссылка не открылась, покажем пользователю сообщение
+            showToast(t('pleaseOpenLink') || 'Please open the link manually', 'info', 5000);
+        }, 1000);
+    } catch (error) {
+        console.error('Failed to open link:', error);
+        // Показать модальное окно с кнопкой
+        showPaymentLinkModal(url);
     }
 }
 
