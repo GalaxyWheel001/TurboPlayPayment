@@ -614,6 +614,13 @@ function showError(message) {
 // OPEN PAYMENT LINK (MOBILE FIX)
 // ============================================
 
+// Функция для определения мобильного устройства
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
+           ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+}
+
 // Улучшенная функция для открытия ссылки на оплату на мобильных устройствах
 function openPaymentLink(url) {
     console.log('Opening payment link:', url); // Debug
@@ -634,6 +641,10 @@ function openPaymentLink(url) {
         return;
     }
     
+    // Определяем, мобильное ли устройство
+    const isMobile = isMobileDevice();
+    console.log('Is mobile device:', isMobile);
+    
     // Способ 1: Использовать Telegram Web App API (предпочтительно, только если доступен)
     if (tg && typeof tg.openLink === 'function') {
         try {
@@ -652,11 +663,18 @@ function openPaymentLink(url) {
         }
     }
     
-    // Если Telegram API недоступен (standalone режим), пробуем открыть сразу
-    // Но на мобильных браузерах window.open может быть заблокирован, поэтому показываем модальное окно
+    // Если Telegram API недоступен (standalone режим)
     console.log('Telegram API not available, running in standalone mode');
     
-    // Пробуем открыть через window.open (может не работать на мобильных без действия пользователя)
+    // На мобильных устройствах сразу показываем модальное окно
+    // так как window.open часто блокируется браузером
+    if (isMobile) {
+        console.log('Mobile device detected, showing modal immediately');
+        showPaymentLinkModal(url);
+        return;
+    }
+    
+    // На десктопе пробуем открыть через window.open
     try {
         const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
         if (openedWindow && !openedWindow.closed) {
@@ -673,8 +691,7 @@ function openPaymentLink(url) {
         console.warn('window.open failed:', error);
     }
     
-    // Если window.open заблокирован или не работает, сразу показываем модальное окно
-    // Это гарантирует, что пользователь сможет открыть ссылку по своему действию
+    // Если window.open заблокирован или не работает, показываем модальное окно
     tryMainButtonOrModal(url);
 }
 
@@ -821,9 +838,9 @@ function showPaymentLinkModal(url) {
     modal.style.display = 'flex';
 }
 
-// Прямое открытие ссылки (последний способ)
+// Прямое открытие ссылки (последний способ) - вызывается по действию пользователя
 function openLinkDirect(url) {
-    console.log('Opening link directly:', url);
+    console.log('Opening link directly (user action):', url);
     
     // Попробовать несколько способов
     try {
@@ -838,7 +855,18 @@ function openLinkDirect(url) {
             }
         }
         
-        // Способ 2: Создать временную ссылку и кликнуть по ней
+        // Способ 2: window.open (должен работать, так как вызывается по действию пользователя)
+        try {
+            const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+            if (openedWindow) {
+                console.log('Opened via window.open in openLinkDirect');
+                return;
+            }
+        } catch (e) {
+            console.warn('window.open failed in openLinkDirect:', e);
+        }
+        
+        // Способ 3: Создать временную ссылку и кликнуть по ней
         const link = document.createElement('a');
         link.href = url;
         link.target = '_blank';
@@ -847,18 +875,23 @@ function openLinkDirect(url) {
         document.body.appendChild(link);
         
         // Пытаемся открыть через программный клик
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        });
-        link.dispatchEvent(clickEvent);
-        
-        // Также пытаемся через обычный click
         try {
             link.click();
+            console.log('Opened link via temporary <a> element click');
         } catch (e) {
             console.warn('link.click() failed:', e);
+            // Пытаемся через MouseEvent
+            try {
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
+                });
+                link.dispatchEvent(clickEvent);
+                console.log('Opened link via MouseEvent');
+            } catch (e2) {
+                console.warn('MouseEvent failed:', e2);
+            }
         }
         
         // Удаляем ссылку через небольшую задержку
@@ -868,22 +901,10 @@ function openLinkDirect(url) {
             }
         }, 100);
         
-        console.log('Opened link via temporary <a> element');
-        
-        // Способ 3: Если не сработало, использовать window.open
-        setTimeout(() => {
-            try {
-                window.open(url, '_blank', 'noopener,noreferrer');
-            } catch (e) {
-                console.warn('window.open failed:', e);
-                // Показать модальное окно с кнопкой
-                showPaymentLinkModal(url);
-            }
-        }, 200);
     } catch (error) {
         console.error('Failed to open link:', error);
-        // Показать модальное окно с кнопкой
-        showPaymentLinkModal(url);
+        // Если все не работает, показываем сообщение
+        showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
     }
 }
 
