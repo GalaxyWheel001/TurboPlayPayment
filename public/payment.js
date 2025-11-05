@@ -318,11 +318,25 @@ async function createPayment(providerName = 'moonpay') {
             
             // Проверяем наличие paymentUrl
             console.log('Payment URL received:', data.paymentUrl);
+            console.log('Full payment data:', data);
             
-            // Небольшая задержка перед открытием ссылки (для мобильных)
-            setTimeout(() => {
-                openPaymentLink(data.paymentUrl);
-            }, 300);
+            // На мобильных устройствах сразу показываем модальное окно
+            // на десктопе пробуем открыть автоматически
+            const isMobile = isMobileDevice();
+            console.log('Is mobile device:', isMobile);
+            
+            if (isMobile) {
+                // На мобильных сразу показываем модальное окно
+                console.log('Mobile device - showing modal immediately');
+                setTimeout(() => {
+                    showPaymentLinkModal(data.paymentUrl);
+                }, 500);
+            } else {
+                // На десктопе пробуем открыть автоматически
+                setTimeout(() => {
+                    openPaymentLink(data.paymentUrl);
+                }, 300);
+            }
         } else {
             hideProgress();
             const errorMsg = data.error || (data.success ? 'Payment URL not received' : t('failedToCreate'));
@@ -614,12 +628,15 @@ function showError(message) {
 // OPEN PAYMENT LINK (MOBILE FIX)
 // ============================================
 
-// Функция для определения мобильного устройства
+// Функция для определения мобильного устройства (должна быть определена в начале)
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
            (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
            ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 }
+
+// Экспортируем функцию для использования везде
+window.isMobileDevice = isMobileDevice;
 
 // Улучшенная функция для открытия ссылки на оплату на мобильных устройствах
 function openPaymentLink(url) {
@@ -840,50 +857,93 @@ function showPaymentLinkModal(url) {
     setTimeout(() => {
         const openBtn = document.getElementById('openPaymentLinkBtn');
         if (openBtn) {
+            console.log('Button found, adding event listeners');
+            
             // Удаляем старые обработчики если есть
             const newBtn = openBtn.cloneNode(true);
             openBtn.parentNode.replaceChild(newBtn, openBtn);
             
             const btn = document.getElementById('openPaymentLinkBtn');
             if (btn) {
+                console.log('Button recreated, setting up handlers');
+                
+                // Функция для открытия ссылки
+                const handleOpen = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    console.log('Opening link from button:', url);
+                    
+                    // Закрываем модальное окно
+                    modal.style.display = 'none';
+                    
+                    // Открываем ссылку
+                    openLinkDirect(url);
+                };
+                
                 // Обработчик click для всех устройств
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Button clicked, opening link');
-                    openLink();
-                });
+                btn.addEventListener('click', handleOpen);
+                console.log('Click handler added');
                 
                 // Обработчики touch для мобильных
+                let touchStartTime = 0;
                 btn.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    touchStartTime = Date.now();
                     btn.classList.add('active');
-                }, { passive: false });
+                    console.log('Touch start');
+                }, { passive: true });
                 
                 btn.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    const touchDuration = Date.now() - touchStartTime;
                     btn.classList.remove('active');
-                    console.log('Button touched, opening link');
-                    openLink();
+                    
+                    // Если касание было коротким (не свайп), открываем ссылку
+                    if (touchDuration < 300) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Touch end (short tap), opening link');
+                        handleOpen(e);
+                    }
                 }, { passive: false });
                 
+                btn.addEventListener('touchcancel', function() {
+                    btn.classList.remove('active');
+                });
+                
                 // Также добавляем onclick атрибут как запасной вариант
-                btn.setAttribute('onclick', 'openLinkDirect("' + url.replace(/"/g, '&quot;') + '"); this.closest(".modal-overlay").style.display="none";');
+                const escapedUrl = url.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                btn.setAttribute('onclick', `window.openLinkDirect('${escapedUrl}'); this.closest('.modal-overlay').style.display='none';`);
+                console.log('onclick attribute added');
+                
+                // Делаем кнопку видимой и кликабельной
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+                btn.style.opacity = '1';
+                btn.style.visibility = 'visible';
+                
+                console.log('All handlers added successfully');
+            } else {
+                console.error('Button not found after recreation');
             }
         } else {
             console.error('Button not found after creation');
         }
-    }, 100);
+    }, 150);
     
+    // Показываем модальное окно
     modal.style.display = 'flex';
-    console.log('Modal displayed');
+    modal.style.visibility = 'visible';
+    modal.style.opacity = '1';
+    modal.style.zIndex = '10000';
+    console.log('Modal displayed, style:', modal.style.display);
 }
 
 // Прямое открытие ссылки (последний способ) - вызывается по действию пользователя
 function openLinkDirect(url) {
-    console.log('Opening link directly (user action):', url);
+    console.log('=== openLinkDirect called ===');
+    console.log('URL:', url);
+    console.log('URL type:', typeof url);
     
     // Проверка URL
     if (!url || typeof url !== 'string') {
@@ -892,33 +952,68 @@ function openLinkDirect(url) {
         return;
     }
     
-    // Попробовать несколько способов
+    // Проверяем валидность URL
     try {
-        // Способ 1: Через Telegram API если доступен
-        if (tg && typeof tg.openLink === 'function') {
-            try {
-                tg.openLink(url);
-                console.log('Opened via tg.openLink in openLinkDirect');
-                return;
-            } catch (err) {
-                console.warn('tg.openLink failed in openLinkDirect:', err);
-            }
+        new URL(url);
+        console.log('URL is valid');
+    } catch (e) {
+        console.error('Invalid URL format:', url, e);
+        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        return;
+    }
+    
+    // Попробовать несколько способов
+    let opened = false;
+    
+    // Способ 1: window.open (должен работать, так как вызывается по действию пользователя)
+    try {
+        console.log('Trying window.open...');
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (openedWindow) {
+            console.log('window.open returned:', openedWindow);
+            opened = true;
+            // Проверяем через небольшую задержку
+            setTimeout(() => {
+                if (openedWindow.closed) {
+                    console.log('Window was closed, trying other methods');
+                    tryOtherMethods(url);
+                } else {
+                    console.log('Window is open');
+                }
+            }, 500);
+            return;
+        } else {
+            console.warn('window.open returned null (blocked)');
         }
-        
-        // Способ 2: window.open (должен работать, так как вызывается по действию пользователя)
+    } catch (e) {
+        console.warn('window.open failed:', e);
+    }
+    
+    // Если window.open не сработал, пробуем другие способы
+    if (!opened) {
+        tryOtherMethods(url);
+    }
+}
+
+// Дополнительные методы открытия ссылки
+function tryOtherMethods(url) {
+    console.log('Trying other methods to open link...');
+    
+    // Способ 2: Через Telegram API если доступен
+    if (tg && typeof tg.openLink === 'function') {
         try {
-            const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
-            if (openedWindow && !openedWindow.closed) {
-                console.log('Opened via window.open in openLinkDirect');
-                return;
-            } else {
-                console.warn('window.open returned null or closed window');
-            }
-        } catch (e) {
-            console.warn('window.open failed in openLinkDirect:', e);
+            console.log('Trying tg.openLink...');
+            tg.openLink(url);
+            console.log('Opened via tg.openLink');
+            return;
+        } catch (err) {
+            console.warn('tg.openLink failed:', err);
         }
-        
-        // Способ 3: Создать временную ссылку и кликнуть по ней
+    }
+    
+    // Способ 3: Создать временную ссылку и кликнуть по ней
+    try {
+        console.log('Trying temporary link method...');
         const link = document.createElement('a');
         link.href = url;
         link.target = '_blank';
@@ -927,25 +1022,8 @@ function openLinkDirect(url) {
         document.body.appendChild(link);
         
         // Пытаемся открыть через программный клик
-        try {
-            link.click();
-            console.log('Opened link via temporary <a> element click');
-        } catch (e) {
-            console.warn('link.click() failed:', e);
-            // Пытаемся через MouseEvent
-            try {
-                const clickEvent = new MouseEvent('click', {
-                    view: window,
-                    bubbles: true,
-                    cancelable: true,
-                    buttons: 1
-                });
-                link.dispatchEvent(clickEvent);
-                console.log('Opened link via MouseEvent');
-            } catch (e2) {
-                console.warn('MouseEvent failed:', e2);
-            }
-        }
+        link.click();
+        console.log('Opened link via temporary <a> element click');
         
         // Удаляем ссылку через небольшую задержку
         setTimeout(() => {
@@ -954,20 +1032,18 @@ function openLinkDirect(url) {
             }
         }, 1000);
         
-        // Способ 4: Использовать location.href как последний вариант (откроет в том же окне)
-        setTimeout(() => {
-            console.log('Trying location.href as last resort');
-            try {
-                window.location.href = url;
-            } catch (e) {
-                console.error('location.href failed:', e);
-                showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
-            }
-        }, 500);
-        
-    } catch (error) {
-        console.error('Failed to open link:', error);
-        // Если все не работает, показываем сообщение
+        return;
+    } catch (e) {
+        console.warn('Temporary link method failed:', e);
+    }
+    
+    // Способ 4: Использовать location.href как последний вариант (откроет в том же окне)
+    console.log('Trying location.href as last resort...');
+    try {
+        window.location.href = url;
+        console.log('Redirected via location.href');
+    } catch (e) {
+        console.error('location.href failed:', e);
         showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
     }
 }
