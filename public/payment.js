@@ -629,13 +629,50 @@ function openPaymentLink(url) {
         }
     }
     
-    // Способ 2: Использовать MainButton от Telegram (если доступно)
+    // Способ 2: Попробовать открыть через window.location (для внешних ссылок)
+    try {
+        // Создаем временную ссылку и кликаем по ней
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        
+        // Пытаемся открыть
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        link.dispatchEvent(clickEvent);
+        
+        // Удаляем ссылку через небольшую задержку
+        setTimeout(() => {
+            document.body.removeChild(link);
+        }, 100);
+        
+        console.log('Opened link via temporary link element');
+        return;
+    } catch (error) {
+        console.warn('Temporary link failed:', error);
+    }
+    
+    // Способ 3: Использовать MainButton от Telegram (если доступно)
     if (tg && tg.MainButton && typeof tg.MainButton.show === 'function') {
         try {
             tg.MainButton.setText(t('openPaymentLink') || 'Open Payment Link');
             tg.MainButton.show();
             tg.MainButton.onClick(() => {
-                tg.openLink(url);
+                try {
+                    if (tg.openLink) {
+                        tg.openLink(url);
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                } catch (err) {
+                    window.open(url, '_blank');
+                }
                 tg.MainButton.hide();
             });
             console.log('Using MainButton for payment link');
@@ -645,7 +682,7 @@ function openPaymentLink(url) {
         }
     }
     
-    // Способ 3: Показать модальное окно с кнопкой для открытия
+    // Способ 4: Показать модальное окно с кнопкой для открытия
     showPaymentLinkModal(url);
 }
 
@@ -694,8 +731,16 @@ function openLinkDirect(url) {
     
     // Попробовать несколько способов
     try {
-        // Способ 1: Через location (работает всегда, но открывает в том же окне)
-        // Это запасной вариант, если все остальное не работает
+        // Способ 1: Через Telegram API если доступен
+        if (tg && typeof tg.openLink === 'function') {
+            try {
+                tg.openLink(url);
+                console.log('Opened via tg.openLink in openLinkDirect');
+                return;
+            } catch (err) {
+                console.warn('tg.openLink failed in openLinkDirect:', err);
+            }
+        }
         
         // Способ 2: Создать временную ссылку и кликнуть по ней
         const link = document.createElement('a');
@@ -704,15 +749,41 @@ function openLinkDirect(url) {
         link.rel = 'noopener noreferrer';
         link.style.display = 'none';
         document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        
+        // Пытаемся открыть через программный клик
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        link.dispatchEvent(clickEvent);
+        
+        // Также пытаемся через обычный click
+        try {
+            link.click();
+        } catch (e) {
+            console.warn('link.click() failed:', e);
+        }
+        
+        // Удаляем ссылку через небольшую задержку
+        setTimeout(() => {
+            if (link.parentNode) {
+                document.body.removeChild(link);
+            }
+        }, 100);
+        
         console.log('Opened link via temporary <a> element');
         
-        // Способ 3: Если не сработало, использовать location.href через небольшую задержку
+        // Способ 3: Если не сработало, использовать window.open
         setTimeout(() => {
-            // Если ссылка не открылась, покажем пользователю сообщение
-            showToast(t('pleaseOpenLink') || 'Please open the link manually', 'info', 5000);
-        }, 1000);
+            try {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            } catch (e) {
+                console.warn('window.open failed:', e);
+                // Показать модальное окно с кнопкой
+                showPaymentLinkModal(url);
+            }
+        }, 200);
     } catch (error) {
         console.error('Failed to open link:', error);
         // Показать модальное окно с кнопкой
@@ -740,46 +811,56 @@ function setupDarkMode() {
         // Apply theme
         applyTheme(theme);
         
-        // Theme toggle handler
+        // Theme toggle handler - упрощенная версия для мобильных
         if (themeToggle) {
-            // Удаляем старые обработчики если есть
+            // Функция для переключения темы
+            const toggleTheme = () => {
+                const currentTheme = html.getAttribute('data-theme') || 'light';
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+                console.log('Theme changed to:', newTheme);
+                
+                // Haptic feedback
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            };
+            
+            // Удаляем все старые обработчики
             const newToggle = themeToggle.cloneNode(true);
             themeToggle.parentNode.replaceChild(newToggle, themeToggle);
             
             // Получаем новый элемент
             const toggle = document.getElementById('themeToggle');
             if (toggle) {
-                // Функция для переключения темы
-                const toggleTheme = (e) => {
-                    if (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                    const currentTheme = html.getAttribute('data-theme') || 'light';
-                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                    applyTheme(newTheme);
-                    localStorage.setItem('theme', newTheme);
-                    console.log('Theme changed to:', newTheme);
-                };
-                
-                // Обработчик click для десктопа
-                toggle.addEventListener('click', toggleTheme);
-                
-                // Обработчики touch для мобильных
-                toggle.addEventListener('touchstart', function(e) {
+                // Универсальный обработчик - работает и на click, и на touch
+                toggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
+                    toggleTheme();
+                });
+                
+                // Дополнительный обработчик для touch (на случай если click не сработает)
+                let touchStartTime = 0;
+                toggle.addEventListener('touchstart', function(e) {
+                    touchStartTime = Date.now();
                     toggle.classList.add('active');
-                }, { passive: false });
+                }, { passive: true });
                 
                 toggle.addEventListener('touchend', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    const touchDuration = Date.now() - touchStartTime;
                     toggle.classList.remove('active');
-                    toggleTheme(e);
+                    
+                    // Если касание было коротким (не свайп), переключаем тему
+                    if (touchDuration < 300) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleTheme();
+                    }
                 }, { passive: false });
                 
-                toggle.addEventListener('touchcancel', function(e) {
+                toggle.addEventListener('touchcancel', function() {
                     toggle.classList.remove('active');
                 });
             }
