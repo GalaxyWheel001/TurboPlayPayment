@@ -801,10 +801,13 @@ function tryMainButtonOrModal(url) {
 
 // Показать модальное окно с кнопкой для открытия ссылки
 function showPaymentLinkModal(url) {
+    console.log('Showing payment link modal with URL:', url);
+    
     const modal = document.getElementById('paymentResult');
     const resultContent = document.getElementById('resultContent');
     
     if (!modal || !resultContent) {
+        console.error('Modal elements not found, trying direct open');
         // Если модальное окно не найдено, используем прямой способ
         openLinkDirect(url);
         return;
@@ -812,12 +815,19 @@ function showPaymentLinkModal(url) {
     
     resultContent.className = 'result-content info';
     
+    // Функция для открытия ссылки
+    const openLink = () => {
+        console.log('Opening link from modal button:', url);
+        openLinkDirect(url);
+        modal.style.display = 'none';
+    };
+    
     // Создаем элементы безопасно
     resultContent.innerHTML = `
         <div class="success-icon">🔗</div>
         <h3>${escapeHtml(t('paymentLinkReady') || 'Payment Link Ready')}</h3>
         <p class="result-message">${escapeHtml(t('clickToOpenPayment') || 'Click the button below to open the payment page')}</p>
-        <button class="btn btn-primary" id="openPaymentLinkBtn" style="margin-top: 20px;">
+        <button class="btn btn-primary" id="openPaymentLinkBtn" type="button" style="margin-top: 20px; width: 100%;">
             ${escapeHtml(t('openPaymentPage') || 'Open Payment Page')}
         </button>
         <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
@@ -826,21 +836,61 @@ function showPaymentLinkModal(url) {
         <input type="text" id="paymentLinkInput" value="${escapeHtml(url)}" readonly style="width: 100%; padding: 8px; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 12px;" onclick="this.select();">
     `;
     
-    // Добавляем обработчик события для кнопки
-    const openBtn = document.getElementById('openPaymentLinkBtn');
-    if (openBtn) {
-        openBtn.addEventListener('click', () => {
-            openLinkDirect(url);
-            modal.style.display = 'none';
-        });
-    }
+    // Добавляем обработчики событий для кнопки (с задержкой для мобильных)
+    setTimeout(() => {
+        const openBtn = document.getElementById('openPaymentLinkBtn');
+        if (openBtn) {
+            // Удаляем старые обработчики если есть
+            const newBtn = openBtn.cloneNode(true);
+            openBtn.parentNode.replaceChild(newBtn, openBtn);
+            
+            const btn = document.getElementById('openPaymentLinkBtn');
+            if (btn) {
+                // Обработчик click для всех устройств
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Button clicked, opening link');
+                    openLink();
+                });
+                
+                // Обработчики touch для мобильных
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    btn.classList.add('active');
+                }, { passive: false });
+                
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    btn.classList.remove('active');
+                    console.log('Button touched, opening link');
+                    openLink();
+                }, { passive: false });
+                
+                // Также добавляем onclick атрибут как запасной вариант
+                btn.setAttribute('onclick', 'openLinkDirect("' + url.replace(/"/g, '&quot;') + '"); this.closest(".modal-overlay").style.display="none";');
+            }
+        } else {
+            console.error('Button not found after creation');
+        }
+    }, 100);
     
     modal.style.display = 'flex';
+    console.log('Modal displayed');
 }
 
 // Прямое открытие ссылки (последний способ) - вызывается по действию пользователя
 function openLinkDirect(url) {
     console.log('Opening link directly (user action):', url);
+    
+    // Проверка URL
+    if (!url || typeof url !== 'string') {
+        console.error('Invalid URL in openLinkDirect:', url);
+        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        return;
+    }
     
     // Попробовать несколько способов
     try {
@@ -858,9 +908,11 @@ function openLinkDirect(url) {
         // Способ 2: window.open (должен работать, так как вызывается по действию пользователя)
         try {
             const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
-            if (openedWindow) {
+            if (openedWindow && !openedWindow.closed) {
                 console.log('Opened via window.open in openLinkDirect');
                 return;
+            } else {
+                console.warn('window.open returned null or closed window');
             }
         } catch (e) {
             console.warn('window.open failed in openLinkDirect:', e);
@@ -885,7 +937,8 @@ function openLinkDirect(url) {
                 const clickEvent = new MouseEvent('click', {
                     view: window,
                     bubbles: true,
-                    cancelable: true
+                    cancelable: true,
+                    buttons: 1
                 });
                 link.dispatchEvent(clickEvent);
                 console.log('Opened link via MouseEvent');
@@ -899,7 +952,18 @@ function openLinkDirect(url) {
             if (link.parentNode) {
                 document.body.removeChild(link);
             }
-        }, 100);
+        }, 1000);
+        
+        // Способ 4: Использовать location.href как последний вариант (откроет в том же окне)
+        setTimeout(() => {
+            console.log('Trying location.href as last resort');
+            try {
+                window.location.href = url;
+            } catch (e) {
+                console.error('location.href failed:', e);
+                showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
+            }
+        }, 500);
         
     } catch (error) {
         console.error('Failed to open link:', error);
@@ -907,6 +971,9 @@ function openLinkDirect(url) {
         showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
     }
 }
+
+// Экспортируем функцию для использования в onclick атрибутах
+window.openLinkDirect = openLinkDirect;
 
 // ============================================
 // DARK MODE SUPPORT

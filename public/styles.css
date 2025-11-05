@@ -1182,11 +1182,20 @@ body::before {
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 10000;
     padding: var(--spacing-lg);
+    /* Обеспечиваем видимость на мобильных */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.modal-overlay[style*="display: flex"],
+.modal-overlay[style*="display:flex"] {
+    display: flex !important;
 }
 
 .modal-content {
@@ -1200,6 +1209,12 @@ body::before {
     box-shadow: var(--shadow-xl);
     border: 1px solid var(--border-color);
     animation: modalSlideIn 0.3s ease;
+    /* Обеспечиваем видимость на мобильных */
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    position: relative;
+    margin: auto;
 }
 
 @keyframes modalSlideIn {
@@ -1224,6 +1239,12 @@ body::before {
 
 .result-content.error {
     color: var(--error);
+}
+
+.result-content.info {
+    color: var(--text-primary);
+    border-left: 4px solid var(--primary);
+    padding-left: 20px;
 }
 
 .success-icon,
@@ -1844,6 +1865,31 @@ body::before {
     .progress-container {
         padding: 16px;
         margin: 20px 0;
+    }
+    
+    /* Модальное окно на мобильных */
+    .modal-overlay {
+        padding: var(--spacing-md);
+    }
+    
+    .modal-content {
+        padding: var(--spacing-lg);
+        max-width: 100%;
+        max-height: 95vh;
+    }
+    
+    .result-content h3 {
+        font-size: 20px;
+    }
+    
+    /* Кнопка в модальном окне на мобильных */
+    #openPaymentLinkBtn {
+        width: 100% !important;
+        padding: 16px 24px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
     }
 }
 
