@@ -47,7 +47,8 @@ const API_BASE_URL = window.location.origin;
 function getApiPath(endpoint) {
     // На Netlify используем прокси через /api/
     // Netlify автоматически перенаправит на /.netlify/functions/
-    return `/api/${endpoint}`;
+    // Используем полный URL для надежности
+    return `${API_BASE_URL}/api/${endpoint}`;
 }
 
 // Инициализация при загрузке страницы
@@ -180,12 +181,15 @@ async function createPayment(providerName = 'moonpay') {
 
         // Создать callback URL
         const userId = user.id || '';
-        const callbackUrl = `${API_BASE_URL}${getApiPath('callback')}?user_id=${userId}`;
+        const callbackUrl = `${API_BASE_URL}/api/callback?user_id=${userId}`;
 
         // Шаг 2: Отправка запроса
         showProgress(50, 'Sending request...');
         
-        const response = await fetch(getApiPath('create-payment'), {
+        const apiUrl = getApiPath('create-payment');
+        console.log('Creating payment with URL:', apiUrl); // Debug
+        
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -204,7 +208,15 @@ async function createPayment(providerName = 'moonpay') {
 
         showProgress(75, 'Processing response...');
 
+        // Проверить статус ответа
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error:', response.status, errorText);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
+        console.log('Payment response:', data); // Debug
 
         if (data.success) {
             showProgress(100, 'Payment created!');
@@ -551,17 +563,22 @@ function applyTheme(theme) {
     
     if (theme === 'dark') {
         html.setAttribute('data-theme', 'dark');
-        // Перезаписать стили Telegram для темной темы
+        // Убедиться, что стили Telegram не перезаписывают темную тему
         body.style.backgroundColor = '';
         body.style.color = '';
         body.style.removeProperty('background-color');
         body.style.removeProperty('color');
+        body.classList.add('dark-theme-active');
         if (themeIcon) {
             themeIcon.innerHTML = '<use href="#icon-moon"></use>';
         }
-        console.log('Dark theme applied, data-theme:', html.getAttribute('data-theme')); // Debug
+        // Принудительно применить стили для темной темы
+        body.setAttribute('data-theme', 'dark');
+        console.log('Dark theme applied, data-theme:', html.getAttribute('data-theme'), 'body data-theme:', body.getAttribute('data-theme')); // Debug
     } else {
         html.removeAttribute('data-theme');
+        body.removeAttribute('data-theme');
+        body.classList.remove('dark-theme-active');
         // Восстановить стили Telegram для светлой темы
         if (window.tg && window.tg.themeParams) {
             body.style.backgroundColor = window.tg.themeParams.bg_color || '#ffffff';
@@ -575,6 +592,14 @@ function applyTheme(theme) {
         }
         console.log('Light theme applied'); // Debug
     }
+    
+    // Принудительно обновить стили через requestAnimationFrame
+    requestAnimationFrame(() => {
+        if (theme === 'dark') {
+            body.style.backgroundColor = '';
+            body.style.color = '';
+        }
+    });
 }
 
 // ============================================

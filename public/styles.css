@@ -77,7 +77,10 @@
 }
 
 /* Dark Mode Variables - PREMIUM */
-[data-theme="dark"] {
+[data-theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
+body.dark-theme-active {
     --text-primary: #f9fafb;
     --text-secondary: #d1d5db;
     --text-muted: #9ca3af;
@@ -112,13 +115,16 @@
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
 }
 
-[data-theme="dark"] .payment-container {
+[data-theme="dark"] .payment-container,
+body[data-theme="dark"] .payment-container,
+body.dark-theme-active .payment-container {
     background: var(--bg-primary);
     border-color: var(--border-color);
     box-shadow: 
         0 20px 60px rgba(0, 0, 0, 0.5),
         0 0 0 1px var(--border-color),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .payment-container:hover {
@@ -128,14 +134,20 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-[data-theme="dark"] .payment-header-section {
+[data-theme="dark"] .payment-header-section,
+body[data-theme="dark"] .payment-header-section,
+body.dark-theme-active .payment-header-section {
     background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     border-bottom-color: var(--border-color);
+    color: var(--text-primary);
 }
 
-[data-theme="dark"] .payment-amount-section {
+[data-theme="dark"] .payment-amount-section,
+body[data-theme="dark"] .payment-amount-section,
+body.dark-theme-active .payment-amount-section {
     background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     border-bottom-color: var(--border-color);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .theme-toggle {
@@ -164,7 +176,9 @@ body {
     transition: background-color var(--transition-base), color var(--transition-base);
 }
 
-[data-theme="dark"] body {
+[data-theme="dark"] body,
+body[data-theme="dark"],
+body.dark-theme-active {
     background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #1e293b 100%) !important;
     color: var(--text-primary) !important;
 }
