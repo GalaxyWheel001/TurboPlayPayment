@@ -1,15 +1,49 @@
-// Telegram Web App API
-let tg = window.Telegram.WebApp;
+// Telegram Web App API - безопасная инициализация
+let tg = null;
+let user = {};
+let userEmail = '';
 
-// Инициализация Telegram Mini App
-if (tg && tg.ready) {
-    tg.ready();
-    tg.expand();
+// Функция для безопасной инициализации Telegram Web App
+function initTelegramWebApp() {
+    try {
+        // Проверяем доступность Telegram Web App API
+        if (window.Telegram && window.Telegram.WebApp) {
+            tg = window.Telegram.WebApp;
+            
+            // Инициализация Telegram Mini App
+            if (tg && typeof tg.ready === 'function') {
+                tg.ready();
+            }
+            if (tg && typeof tg.expand === 'function') {
+                tg.expand();
+            }
+            
+            // Получить данные пользователя из Telegram
+            if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                user = tg.initDataUnsafe.user;
+                userEmail = user.email || '';
+            }
+        } else {
+            console.log('Telegram Web App API not available - running in standalone mode');
+        }
+    } catch (error) {
+        console.error('Error initializing Telegram Web App:', error);
+        // Продолжаем работу даже если Telegram API недоступен
+    }
 }
 
-// Получить данные пользователя из Telegram
-const user = tg?.initDataUnsafe?.user || {};
-const userEmail = user.email || '';
+// Инициализация при загрузке
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTelegramWebApp);
+} else {
+    // Если DOM уже загружен, ждем немного для загрузки Telegram API
+    setTimeout(initTelegramWebApp, 50);
+}
+
+// Также пытаемся инициализировать после загрузки всех скриптов
+window.addEventListener('load', function() {
+    setTimeout(initTelegramWebApp, 100);
+});
 
 // Конфигурация платежа (можно изменить через URL параметры)
 const urlParams = new URLSearchParams(window.location.search);
@@ -51,8 +85,19 @@ function getApiPath(endpoint) {
     return `${API_BASE_URL}/api/${endpoint}`;
 }
 
+// Функция инициализации приложения
+function initPaymentApp() {
+    // Убедиться, что Telegram API инициализирован
+    if (!tg) {
+        initTelegramWebApp();
+    }
+    
+    // Инициализация при загрузке страницы
+    initializePaymentPage();
+}
+
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', async () => {
+function initializePaymentPage() {
     // Убедиться, что модальное окно скрыто при загрузке (если платеж не был создан)
     const paymentResult = document.getElementById('paymentResult');
     if (paymentResult) {
@@ -121,7 +166,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.body.style.color = tg.themeParams.text_color || '#000000';
         }
     }
-});
+}
+
+// Инициализация при загрузке DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(initPaymentApp, 100);
+    });
+} else {
+    // DOM уже загружен
+    setTimeout(initPaymentApp, 100);
+}
+
+// Экспортируем функцию для вызова из HTML
+window.initPaymentApp = initPaymentApp;
 
 // Удалены функции выбора сети/криптовалюты - теперь только Bitcoin
 

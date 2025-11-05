@@ -6,7 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Payment - Ready to Pay</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=6.4">
     <style>
@@ -205,6 +205,61 @@
         </div>
     </div>
 
+    <script>
+        // Обработка ошибок загрузки скриптов
+        window.addEventListener('error', function(e) {
+            console.error('Script error:', e);
+            // Показываем страницу даже при ошибках
+            if (document.body) {
+                document.body.style.visibility = 'visible';
+                document.body.style.opacity = '1';
+            }
+        }, true);
+        
+        // Показываем страницу сразу
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.body) {
+                document.body.style.visibility = 'visible';
+                document.body.style.opacity = '1';
+            }
+        });
+        
+        // Ожидание загрузки Telegram Web App API
+        function initApp() {
+            // Проверяем, что DOM загружен
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initApp);
+                return;
+            }
+            
+            // Даем время на загрузку Telegram Web App API
+            setTimeout(function() {
+                try {
+                    // Инициализируем приложение
+                    if (typeof window.initPaymentApp === 'function') {
+                        window.initPaymentApp();
+                    } else {
+                        // Если функция еще не загружена, ждем еще
+                        setTimeout(function() {
+                            if (typeof window.initPaymentApp === 'function') {
+                                window.initPaymentApp();
+                            }
+                        }, 200);
+                    }
+                } catch (error) {
+                    console.error('Error initializing app:', error);
+                    // Показываем страницу даже если есть ошибки
+                    if (document.body) {
+                        document.body.style.visibility = 'visible';
+                        document.body.style.opacity = '1';
+                    }
+                }
+            }, 150);
+        }
+        
+        // Запускаем инициализацию
+        initApp();
+    </script>
     <script src="i18n.js"></script>
     <script src="payment.js"></script>
 </body>
