@@ -326,6 +326,12 @@ body::before {
     transform: translateY(0);
 }
 
+/* Поддержка touch событий на мобильных для select (дополнительные стили) */
+.language-selector {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
 /* Theme Toggle */
 .theme-toggle {
     width: 40px;
@@ -354,8 +360,20 @@ body::before {
     background: var(--bg-secondary);
 }
 
-.theme-toggle:active {
+.theme-toggle:active,
+.theme-toggle.active {
     transform: translateY(0);
+    background: var(--bg-tertiary);
+    border-color: var(--primary);
+}
+
+/* Поддержка touch событий на мобильных */
+.theme-toggle {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
 }
 
 .theme-icon {

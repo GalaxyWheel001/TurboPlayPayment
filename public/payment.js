@@ -92,8 +92,19 @@ function initPaymentApp() {
         initTelegramWebApp();
     }
     
-    // Инициализация при загрузке страницы
-    initializePaymentPage();
+    // Проверяем, что DOM полностью загружен
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initializePaymentPage();
+            }, 150);
+        });
+    } else {
+        // DOM уже загружен, но даем время на рендеринг для мобильных
+        setTimeout(() => {
+            initializePaymentPage();
+        }, 150);
+    }
 }
 
 // Инициализация при загрузке страницы
@@ -117,24 +128,45 @@ function initializePaymentPage() {
         });
     }
     
-    // Настройка селектора языка
-    const languageSelector = document.getElementById('languageSelector');
-    if (languageSelector) {
-        // Автоопределение языка из Telegram или сохраненный выбор
-        const savedLang = localStorage.getItem('selectedLanguage');
-        const userLang = user.language_code?.split('-')[0] || 'en';
-        const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-        const detectedLang = langMap[userLang] || 'en';
-        languageSelector.value = savedLang || getCurrentLanguage() || detectedLang;
-        setLanguage(languageSelector.value);
-        
-        // Save language selection
-        languageSelector.addEventListener('change', (e) => {
-            setLanguage(e.target.value);
-            localStorage.setItem('selectedLanguage', e.target.value);
-        });
-        
-    }
+    // Настройка селектора языка - с задержкой для мобильных
+    setTimeout(() => {
+        const languageSelector = document.getElementById('languageSelector');
+        if (languageSelector) {
+            // Автоопределение языка из Telegram или сохраненный выбор
+            const savedLang = localStorage.getItem('selectedLanguage');
+            const userLang = user.language_code?.split('-')[0] || 'en';
+            const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
+            const detectedLang = langMap[userLang] || 'en';
+            languageSelector.value = savedLang || getCurrentLanguage() || detectedLang;
+            setLanguage(languageSelector.value);
+            
+            // Удаляем старые обработчики если есть
+            const newSelector = languageSelector.cloneNode(true);
+            languageSelector.parentNode.replaceChild(newSelector, languageSelector);
+            
+            // Добавляем обработчики событий для мобильных
+            const selector = document.getElementById('languageSelector');
+            if (selector) {
+                // Обработчик change для всех устройств
+                selector.addEventListener('change', function(e) {
+                    const lang = e.target.value;
+                    setLanguage(lang);
+                    localStorage.setItem('selectedLanguage', lang);
+                    console.log('Language changed to:', lang);
+                });
+                
+                // Дополнительные обработчики для мобильных
+                selector.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                });
+                selector.addEventListener('touchend', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        } else {
+            console.warn('Language selector not found');
+        }
+    }, 100);
 
     // Обновить переводы
     updateTranslations();
@@ -694,34 +726,74 @@ function openLinkDirect(url) {
 
 // Setup Dark Mode
 function setupDarkMode() {
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const html = document.documentElement;
-    
-    // Get saved theme or detect system preference
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-    
-    // Apply theme
-    applyTheme(theme);
-    
-    // Theme toggle handler
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
-    
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-            applyTheme(e.matches ? 'dark' : 'light');
+    // Задержка для мобильных устройств
+    setTimeout(() => {
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+        
+        // Get saved theme or detect system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        
+        // Apply theme
+        applyTheme(theme);
+        
+        // Theme toggle handler
+        if (themeToggle) {
+            // Удаляем старые обработчики если есть
+            const newToggle = themeToggle.cloneNode(true);
+            themeToggle.parentNode.replaceChild(newToggle, themeToggle);
+            
+            // Получаем новый элемент
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                // Функция для переключения темы
+                const toggleTheme = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    const currentTheme = html.getAttribute('data-theme') || 'light';
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    applyTheme(newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    console.log('Theme changed to:', newTheme);
+                };
+                
+                // Обработчик click для десктопа
+                toggle.addEventListener('click', toggleTheme);
+                
+                // Обработчики touch для мобильных
+                toggle.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggle.classList.add('active');
+                }, { passive: false });
+                
+                toggle.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggle.classList.remove('active');
+                    toggleTheme(e);
+                }, { passive: false });
+                
+                toggle.addEventListener('touchcancel', function(e) {
+                    toggle.classList.remove('active');
+                });
+            }
+        } else {
+            console.warn('Theme toggle not found');
         }
-    });
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    }, 100);
 }
 
 // Apply theme
