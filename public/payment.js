@@ -126,6 +126,12 @@ function initializePaymentPage() {
             paymentId: paymentId,
             status: 'success'
         });
+    } else if (paymentStatus === 'failed' || paymentStatus === 'error' || paymentStatus === 'cancelled') {
+        showPaymentFailure({
+            paymentId: paymentId || '',
+            status: paymentStatus,
+            error: urlParams.get('error') || ''
+        });
     }
     
     // Настройка селектора языка - используем делегирование событий для Telegram Mini App
@@ -487,6 +493,54 @@ function showPaymentSuccess(data) {
     // Вибрация (если поддерживается)
     if (tg && tg.HapticFeedback) {
         tg.HapticFeedback.notificationOccurred('success');
+    }
+}
+
+function showPaymentFailure(data) {
+    if (!data) {
+        console.warn('showPaymentFailure called without payment data');
+        return;
+    }
+
+    const modal = document.getElementById('paymentResult');
+    const resultContent = document.getElementById('resultContent');
+
+    if (!modal || !resultContent) {
+        console.error('Payment result modal elements not found for failure state');
+        return;
+    }
+
+    resultContent.className = 'result-content error';
+
+    const emailValue = document.getElementById('email')?.value || '';
+    const statusText = data.status || 'failed';
+    const errorDetail = data.error ? ` (${escapeHtml(data.error)})` : '';
+
+    resultContent.innerHTML = `
+        <div class="error-icon">⚠️</div>
+        <h3>${escapeHtml(t('paymentFailed') || 'Payment not completed')}</h3>
+        <div class="result-details">
+            <div class="result-row">
+                <span class="result-label">${escapeHtml(t('status') || 'Status')}:</span>
+                <span class="result-value">${escapeHtml(statusText)}${errorDetail}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">${escapeHtml(t('email') || 'Email')}:</span>
+                <span class="result-value">${escapeHtml(emailValue)}</span>
+            </div>
+            ${data.paymentId ? `
+            <div class="result-row">
+                <span class="result-label">${escapeHtml(t('paymentId') || 'Payment ID')}:</span>
+                <span class="result-value">${escapeHtml(data.paymentId)}</span>
+            </div>` : ''}
+        </div>
+        <p class="result-message">${escapeHtml(t('paymentFailedMessage') || 'The payment was not completed. You can try again or choose another payment method.')}</p>
+    `;
+
+    modal.style.display = 'flex';
+
+    if (tg && tg.HapticFeedback) {
+        tg.HapticFeedback.notificationOccurred('error');
     }
 }
 

@@ -76,6 +76,12 @@ const translations = {
         paymentPageOpened: "Payment page opened in browser. Complete the payment there.",
         temporaryAddress: "Temporary payment address",
         finalWallet: "Funds will be sent to",
+        paymentSuccessful: "Payment Successful!",
+        paymentCompleted: "Your payment has been successfully completed!",
+        paymentFailed: "Payment not completed",
+        paymentFailedMessage: "The payment was not completed. You can try again or choose another payment method.",
+        paymentId: "Payment ID",
+        status: "Status",
         
         // Errors
         error: "Error",
@@ -102,7 +108,46 @@ const translations = {
         openPaymentLink: "Open Payment Link",
         orCopyLink: "Or copy this link:",
         pleaseOpenLink: "Please open the link manually",
-        invalidPaymentUrl: "Invalid payment URL"
+        invalidPaymentUrl: "Invalid payment URL",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Choose Payment Method",
+        selectPaymentOption: "Select your preferred payment option",
+        cardPayment: "Card Payment",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "IBAN Transfer",
+        ibanTransferSubtitle: "Bank transfer via IBAN",
+        continueButton: "Continue",
+
+        // IBAN Page
+        ibanPageTitle: "Bank Transfer (IBAN)",
+        ibanPageSubtitle: "Use the details below to complete a secure bank transfer.",
+        ibanIntegrationTitle: "Integration Parameters",
+        ibanIntegrationSubtitle: "Copy these values into the provider dashboard.",
+        ibanIntegrationName: "Integration Name",
+        ibanIntegrationDomain: "Domain",
+        ibanIntegrationSecretKey: "Secret Key",
+        ibanIntegrationHandler: "Callback URL",
+        ibanIntegrationSuccess: "Successful payment URL",
+        ibanIntegrationFailure: "Failed payment URL",
+        ibanIntegrationNote: "Keep the secret key private. Share it only with trusted payment providers.",
+        ibanShowSecret: "Show secret",
+        ibanHideSecret: "Hide secret",
+        ibanCopy: "Copy",
+        ibanCopied: "Copied",
+        ibanInstructionsTitle: "Transfer instructions",
+        ibanInstructionsDescription: "Follow these steps to complete the transfer.",
+        ibanStep1: "Initiate a transfer from your bank or payment application.",
+        ibanStep2: "Use the provided IBAN and reference to ensure automatic matching.",
+        ibanStep3: "After sending the funds, wait for confirmation via email.",
+        ibanStatusSuccessTitle: "Transfer confirmed",
+        ibanStatusSuccessMessage: "We have received confirmation. No further action is required.",
+        ibanStatusFailureTitle: "Transfer pending",
+        ibanStatusFailureMessage: "We have not received confirmation yet. Please verify the transfer with your bank.",
+        ibanBackToMethods: "Back to payment methods",
+        ibanSupportTitle: "Need help?",
+        ibanSupportDescription: "Contact support and provide your payment ID or transfer reference.",
+        ibanReferenceLabel: "Reference / Payment ID"
     },
     ru: {
         // Header
@@ -180,6 +225,12 @@ const translations = {
         paymentPageOpened: "Страница оплаты открыта в браузере. Завершите платеж там.",
         temporaryAddress: "Временный адрес для оплаты",
         finalWallet: "Средства будут отправлены на",
+        paymentSuccessful: "Платеж успешно завершен!",
+        paymentCompleted: "Ваш платеж успешно завершен!",
+        paymentFailed: "Платеж не завершен",
+        paymentFailedMessage: "Платеж не был завершен. Попробуйте ещё раз или выберите другой способ оплаты.",
+        paymentId: "ID платежа",
+        status: "Статус",
         
         // Errors
         error: "Ошибка",
@@ -206,7 +257,46 @@ const translations = {
         openPaymentLink: "Открыть ссылку на оплату",
         orCopyLink: "Или скопируйте эту ссылку:",
         pleaseOpenLink: "Пожалуйста, откройте ссылку вручную",
-        invalidPaymentUrl: "Неверная ссылка на оплату"
+        invalidPaymentUrl: "Неверная ссылка на оплату",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Выберите способ оплаты",
+        selectPaymentOption: "Выберите предпочитаемый способ оплаты",
+        cardPayment: "Оплата картой",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "Банковский перевод",
+        ibanTransferSubtitle: "Банковский перевод через IBAN",
+        continueButton: "Продолжить",
+
+        // IBAN Page
+        ibanPageTitle: "Банковский перевод (IBAN)",
+        ibanPageSubtitle: "Используйте данные ниже для безопасного банковского перевода.",
+        ibanIntegrationTitle: "Параметры интеграции",
+        ibanIntegrationSubtitle: "Скопируйте эти значения в кабинете платежного провайдера.",
+        ibanIntegrationName: "Название интеграции",
+        ibanIntegrationDomain: "Домен",
+        ibanIntegrationSecretKey: "Секретный ключ",
+        ibanIntegrationHandler: "URL обработчика",
+        ibanIntegrationSuccess: "URL успешной оплаты",
+        ibanIntegrationFailure: "URL неуспешной оплаты",
+        ibanIntegrationNote: "Храните секретный ключ в безопасности. Передавайте его только доверенным провайдерам.",
+        ibanShowSecret: "Показать ключ",
+        ibanHideSecret: "Скрыть ключ",
+        ibanCopy: "Копировать",
+        ibanCopied: "Скопировано",
+        ibanInstructionsTitle: "Инструкция по переводу",
+        ibanInstructionsDescription: "Следуйте этим шагам, чтобы завершить перевод.",
+        ibanStep1: "Инициируйте перевод в вашем банке или платежном приложении.",
+        ibanStep2: "Используйте указанный IBAN и назначение платежа для автоматического сопоставления.",
+        ibanStep3: "После отправки средств дождитесь подтверждения по email.",
+        ibanStatusSuccessTitle: "Перевод подтверждён",
+        ibanStatusSuccessMessage: "Мы получили подтверждение. Дополнительных действий не требуется.",
+        ibanStatusFailureTitle: "Перевод ожидает подтверждения",
+        ibanStatusFailureMessage: "Подтверждение ещё не получено. Проверьте статус перевода в вашем банке.",
+        ibanBackToMethods: "Вернуться к способам оплаты",
+        ibanSupportTitle: "Нужна помощь?",
+        ibanSupportDescription: "Свяжитесь с поддержкой и укажите ID платежа или назначение перевода.",
+        ibanReferenceLabel: "Назначение / ID платежа"
     },
     tr: {
         // Header
@@ -284,6 +374,12 @@ const translations = {
         paymentPageOpened: "Ödeme sayfası tarayıcıda açıldı. Ödemeyi orada tamamlayın.",
         temporaryAddress: "Geçici ödeme adresi",
         finalWallet: "Fonlar şu adrese gönderilecek",
+        paymentSuccessful: "Ödeme başarıyla tamamlandı!",
+        paymentCompleted: "Ödemeniz başarıyla tamamlandı!",
+        paymentFailed: "Ödeme tamamlanmadı",
+        paymentFailedMessage: "Ödeme tamamlanmadı. Tekrar deneyebilir veya başka bir ödeme yöntemi seçebilirsiniz.",
+        paymentId: "Ödeme Kimliği",
+        status: "Durum",
         
         // Errors
         error: "Hata",
@@ -301,7 +397,55 @@ const translations = {
         toggleTheme: "Temayı değiştir",
         
         // Payment Guarantee
-        paymentGuarantee: "Ödemeniz sektör lideri güvenlik tarafından korunmaktadır"
+        paymentGuarantee: "Ödemeniz sektör lideri güvenlik tarafından korunmaktadır",
+        
+        // Payment Link
+        paymentLinkReady: "Ödeme Bağlantısı Hazır",
+        clickToOpenPayment: "Ödeme sayfasını açmak için aşağıdaki düğmeye tıklayın",
+        openPaymentPage: "Ödeme Sayfasını Aç",
+        openPaymentLink: "Ödeme Bağlantısını Aç",
+        orCopyLink: "Veya bu bağlantıyı kopyalayın:",
+        pleaseOpenLink: "Lütfen bağlantıyı manuel olarak açın",
+        invalidPaymentUrl: "Geçersiz ödeme URL'si",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Ödeme Yöntemini Seçin",
+        selectPaymentOption: "Tercih ettiğiniz ödeme seçeneğini seçin",
+        cardPayment: "Kart Ödemesi",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "IBAN Transferi",
+        ibanTransferSubtitle: "IBAN ile banka transferi",
+        continueButton: "Devam Et",
+
+        // IBAN Page
+        ibanPageTitle: "Banka Havalesi (IBAN)",
+        ibanPageSubtitle: "Güvenli bir banka havalesi yapmak için aşağıdaki bilgileri kullanın.",
+        ibanIntegrationTitle: "Entegrasyon Parametreleri",
+        ibanIntegrationSubtitle: "Bu değerleri sağlayıcı paneline kopyalayın.",
+        ibanIntegrationName: "Entegrasyon Adı",
+        ibanIntegrationDomain: "Alan adı",
+        ibanIntegrationSecretKey: "Gizli anahtar",
+        ibanIntegrationHandler: "Callback URL",
+        ibanIntegrationSuccess: "Başarılı ödeme URL'si",
+        ibanIntegrationFailure: "Başarısız ödeme URL'si",
+        ibanIntegrationNote: "Gizli anahtarı güvende tutun. Yalnızca güvendiğiniz sağlayıcılarla paylaşın.",
+        ibanShowSecret: "Anahtarı göster",
+        ibanHideSecret: "Anahtarı gizle",
+        ibanCopy: "Kopyala",
+        ibanCopied: "Kopyalandı",
+        ibanInstructionsTitle: "Havale talimatları",
+        ibanInstructionsDescription: "Havaleyi tamamlamak için bu adımları izleyin.",
+        ibanStep1: "Bankanızdan veya ödeme uygulamasından bir havale başlatın.",
+        ibanStep2: "Otomatik eşleşme için verilen IBAN ve açıklamayı kullanın.",
+        ibanStep3: "Fonları gönderdikten sonra e-posta ile onay bekleyin.",
+        ibanStatusSuccessTitle: "Havale onaylandı",
+        ibanStatusSuccessMessage: "Onay aldık. Ek işlem gerekmez.",
+        ibanStatusFailureTitle: "Havale beklemede",
+        ibanStatusFailureMessage: "Henüz onay almadık. Lütfen bankanızla havaleyi kontrol edin.",
+        ibanBackToMethods: "Ödeme yöntemlerine dön",
+        ibanSupportTitle: "Yardıma mı ihtiyacınız var?",
+        ibanSupportDescription: "Destek ile iletişime geçin ve ödeme kimliğinizi veya havale açıklamasını paylaşın.",
+        ibanReferenceLabel: "Açıklama / Ödeme Kimliği"
     },
     de: {
         // Header
@@ -379,6 +523,12 @@ const translations = {
         paymentPageOpened: "Zahlungsseite im Browser geöffnet. Vervollständigen Sie die Zahlung dort.",
         temporaryAddress: "Temporäre Zahlungsadresse",
         finalWallet: "Mittel werden gesendet an",
+        paymentSuccessful: "Zahlung erfolgreich!",
+        paymentCompleted: "Ihre Zahlung wurde erfolgreich abgeschlossen!",
+        paymentFailed: "Zahlung nicht abgeschlossen",
+        paymentFailedMessage: "Die Zahlung wurde nicht abgeschlossen. Sie können es erneut versuchen oder eine andere Zahlungsmethode wählen.",
+        paymentId: "Zahlungs-ID",
+        status: "Status",
         
         // Errors
         error: "Fehler",
@@ -396,7 +546,55 @@ const translations = {
         toggleTheme: "Design wechseln",
         
         // Payment Guarantee
-        paymentGuarantee: "Ihre Zahlung wird von branchenführender Sicherheit geschützt"
+        paymentGuarantee: "Ihre Zahlung wird von branchenführender Sicherheit geschützt",
+        
+        // Payment Link
+        paymentLinkReady: "Zahlungslink bereit",
+        clickToOpenPayment: "Klicken Sie auf die Schaltfläche unten, um die Zahlungsseite zu öffnen",
+        openPaymentPage: "Zahlungsseite öffnen",
+        openPaymentLink: "Zahlungslink öffnen",
+        orCopyLink: "Oder kopieren Sie diesen Link:",
+        pleaseOpenLink: "Bitte öffnen Sie den Link manuell",
+        invalidPaymentUrl: "Ungültige Zahlungs-URL",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Zahlungsmethode wählen",
+        selectPaymentOption: "Wählen Sie Ihre bevorzugte Zahlungsoption",
+        cardPayment: "Kartenzahlung",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "IBAN-Überweisung",
+        ibanTransferSubtitle: "Banküberweisung per IBAN",
+        continueButton: "Weiter",
+
+        // IBAN Page
+        ibanPageTitle: "Banküberweisung (IBAN)",
+        ibanPageSubtitle: "Verwenden Sie die folgenden Daten für eine sichere Banküberweisung.",
+        ibanIntegrationTitle: "Integrationsparameter",
+        ibanIntegrationSubtitle: "Tragen Sie diese Werte im Anbieter-Dashboard ein.",
+        ibanIntegrationName: "Integrationsname",
+        ibanIntegrationDomain: "Domain",
+        ibanIntegrationSecretKey: "Geheimer Schlüssel",
+        ibanIntegrationHandler: "Callback-URL",
+        ibanIntegrationSuccess: "URL für erfolgreiche Zahlung",
+        ibanIntegrationFailure: "URL für fehlgeschlagene Zahlung",
+        ibanIntegrationNote: "Bewahren Sie den geheimen Schlüssel sicher auf. Teilen Sie ihn nur mit vertrauenswürdigen Anbietern.",
+        ibanShowSecret: "Schlüssel anzeigen",
+        ibanHideSecret: "Schlüssel verbergen",
+        ibanCopy: "Kopieren",
+        ibanCopied: "Kopiert",
+        ibanInstructionsTitle: "Überweisungsanleitung",
+        ibanInstructionsDescription: "Befolgen Sie diese Schritte, um die Überweisung abzuschließen.",
+        ibanStep1: "Starten Sie eine Überweisung über Ihre Bank oder Zahlungs-App.",
+        ibanStep2: "Verwenden Sie den angegebenen IBAN und den Verwendungszweck für die automatische Zuordnung.",
+        ibanStep3: "Warten Sie nach dem Abschicken auf die Bestätigung per E-Mail.",
+        ibanStatusSuccessTitle: "Überweisung bestätigt",
+        ibanStatusSuccessMessage: "Wir haben die Bestätigung erhalten. Weitere Schritte sind nicht erforderlich.",
+        ibanStatusFailureTitle: "Überweisung ausstehend",
+        ibanStatusFailureMessage: "Wir haben noch keine Bestätigung erhalten. Bitte prüfen Sie die Überweisung bei Ihrer Bank.",
+        ibanBackToMethods: "Zurück zu den Zahlungsmethoden",
+        ibanSupportTitle: "Brauchen Sie Hilfe?",
+        ibanSupportDescription: "Kontaktieren Sie den Support und geben Sie Ihre Zahlungs-ID oder den Verwendungszweck an.",
+        ibanReferenceLabel: "Verwendungszweck / Zahlungs-ID"
     },
     es: {
         // Header
@@ -474,6 +672,12 @@ const translations = {
         paymentPageOpened: "Página de pago abierta en el navegador. Complete el pago allí.",
         temporaryAddress: "Dirección de pago temporal",
         finalWallet: "Los fondos se enviarán a",
+        paymentSuccessful: "¡Pago completado!",
+        paymentCompleted: "Tu pago se ha completado correctamente.",
+        paymentFailed: "Pago no completado",
+        paymentFailedMessage: "El pago no se completó. Puedes intentarlo de nuevo o elegir otro método de pago.",
+        paymentId: "ID de pago",
+        status: "Estado",
         
         // Errors
         error: "Error",
@@ -491,7 +695,55 @@ const translations = {
         toggleTheme: "Cambiar tema",
         
         // Payment Guarantee
-        paymentGuarantee: "Su pago está protegido por seguridad líder en la industria"
+        paymentGuarantee: "Su pago está protegido por seguridad líder en la industria",
+        
+        // Payment Link
+        paymentLinkReady: "Enlace de Pago Listo",
+        clickToOpenPayment: "Haga clic en el botón a continuación para abrir la página de pago",
+        openPaymentPage: "Abrir Página de Pago",
+        openPaymentLink: "Abrir Enlace de Pago",
+        orCopyLink: "O copie este enlace:",
+        pleaseOpenLink: "Por favor, abra el enlace manualmente",
+        invalidPaymentUrl: "URL de pago inválida",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Elegir Método de Pago",
+        selectPaymentOption: "Seleccione su opción de pago preferida",
+        cardPayment: "Pago con Tarjeta",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "Transferencia IBAN",
+        ibanTransferSubtitle: "Transferencia bancaria vía IBAN",
+        continueButton: "Continuar",
+
+        // IBAN Page
+        ibanPageTitle: "Transferencia bancaria (IBAN)",
+        ibanPageSubtitle: "Utiliza los datos a continuación para realizar una transferencia bancaria segura.",
+        ibanIntegrationTitle: "Parámetros de integración",
+        ibanIntegrationSubtitle: "Copia estos valores en el panel del proveedor.",
+        ibanIntegrationName: "Nombre de la integración",
+        ibanIntegrationDomain: "Dominio",
+        ibanIntegrationSecretKey: "Clave secreta",
+        ibanIntegrationHandler: "URL del callback",
+        ibanIntegrationSuccess: "URL de pago exitoso",
+        ibanIntegrationFailure: "URL de pago fallido",
+        ibanIntegrationNote: "Mantén la clave secreta en un lugar seguro. Compártela solo con proveedores de confianza.",
+        ibanShowSecret: "Mostrar clave",
+        ibanHideSecret: "Ocultar clave",
+        ibanCopy: "Copiar",
+        ibanCopied: "Copiado",
+        ibanInstructionsTitle: "Instrucciones de transferencia",
+        ibanInstructionsDescription: "Sigue estos pasos para completar la transferencia.",
+        ibanStep1: "Inicia una transferencia desde tu banco o aplicación de pagos.",
+        ibanStep2: "Utiliza el IBAN y la referencia proporcionados para asegurar la conciliación automática.",
+        ibanStep3: "Después de enviar los fondos, espera la confirmación por correo electrónico.",
+        ibanStatusSuccessTitle: "Transferencia confirmada",
+        ibanStatusSuccessMessage: "Hemos recibido la confirmación. No se requieren más acciones.",
+        ibanStatusFailureTitle: "Transferencia pendiente",
+        ibanStatusFailureMessage: "Aún no hemos recibido la confirmación. Verifica la transferencia con tu banco.",
+        ibanBackToMethods: "Volver a los métodos de pago",
+        ibanSupportTitle: "¿Necesitas ayuda?",
+        ibanSupportDescription: "Contacta al soporte y proporciona tu ID de pago o referencia de transferencia.",
+        ibanReferenceLabel: "Referencia / ID de pago"
     },
     pt: {
         // Header
@@ -569,6 +821,12 @@ const translations = {
         paymentPageOpened: "Página de pagamento aberta no navegador. Complete o pagamento lá.",
         temporaryAddress: "Endereço de pagamento temporário",
         finalWallet: "Os fundos serão enviados para",
+        paymentSuccessful: "Pagamento concluído!",
+        paymentCompleted: "Seu pagamento foi concluído com sucesso!",
+        paymentFailed: "Pagamento não concluído",
+        paymentFailedMessage: "O pagamento não foi concluído. Você pode tentar novamente ou escolher outra forma de pagamento.",
+        paymentId: "ID do pagamento",
+        status: "Status",
         
         // Errors
         error: "Erro",
@@ -586,7 +844,55 @@ const translations = {
         toggleTheme: "Alternar tema",
         
         // Payment Guarantee
-        paymentGuarantee: "Seu pagamento está protegido por segurança líder da indústria"
+        paymentGuarantee: "Seu pagamento está protegido por segurança líder da indústria",
+        
+        // Payment Link
+        paymentLinkReady: "Link de Pagamento Pronto",
+        clickToOpenPayment: "Clique no botão abaixo para abrir a página de pagamento",
+        openPaymentPage: "Abrir Página de Pagamento",
+        openPaymentLink: "Abrir Link de Pagamento",
+        orCopyLink: "Ou copie este link:",
+        pleaseOpenLink: "Por favor, abra o link manualmente",
+        invalidPaymentUrl: "URL de pagamento inválida",
+        
+        // Payment Method Selection Page
+        choosePaymentMethod: "Escolher Método de Pagamento",
+        selectPaymentOption: "Selecione sua opção de pagamento preferida",
+        cardPayment: "Pagamento com Cartão",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "Transferência IBAN",
+        ibanTransferSubtitle: "Transferência bancária via IBAN",
+        continueButton: "Continuar",
+
+        // IBAN Page
+        ibanPageTitle: "Transferência bancária (IBAN)",
+        ibanPageSubtitle: "Use os dados abaixo para concluir uma transferência bancária segura.",
+        ibanIntegrationTitle: "Parâmetros de integração",
+        ibanIntegrationSubtitle: "Copie esses valores no painel do provedor.",
+        ibanIntegrationName: "Nome da integração",
+        ibanIntegrationDomain: "Domínio",
+        ibanIntegrationSecretKey: "Chave secreta",
+        ibanIntegrationHandler: "URL do callback",
+        ibanIntegrationSuccess: "URL de pagamento bem-sucedido",
+        ibanIntegrationFailure: "URL de pagamento malsucedido",
+        ibanIntegrationNote: "Mantenha a chave secreta em segurança. Compartilhe apenas com provedores confiáveis.",
+        ibanShowSecret: "Mostrar chave",
+        ibanHideSecret: "Ocultar chave",
+        ibanCopy: "Copiar",
+        ibanCopied: "Copiado",
+        ibanInstructionsTitle: "Instruções da transferência",
+        ibanInstructionsDescription: "Siga estas etapas para concluir a transferência.",
+        ibanStep1: "Inicie uma transferência no seu banco ou aplicativo de pagamentos.",
+        ibanStep2: "Use o IBAN e a referência fornecidos para garantir a conciliação automática.",
+        ibanStep3: "Após enviar os fundos, aguarde a confirmação por e-mail.",
+        ibanStatusSuccessTitle: "Transferência confirmada",
+        ibanStatusSuccessMessage: "Recebemos a confirmação. Nenhuma outra ação é necessária.",
+        ibanStatusFailureTitle: "Transferência pendente",
+        ibanStatusFailureMessage: "Ainda não recebemos a confirmação. Verifique a transferência com seu banco.",
+        ibanBackToMethods: "Voltar aos métodos de pagamento",
+        ibanSupportTitle: "Precisa de ajuda?",
+        ibanSupportDescription: "Entre em contato com o suporte e informe o ID do pagamento ou a referência da transferência.",
+        ibanReferenceLabel: "Referência / ID do pagamento"
     }
 };
 

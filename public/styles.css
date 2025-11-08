@@ -246,6 +246,18 @@ body::before {
     z-index: 1;
 }
 
+.section-heading {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.section-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
 /* Top Controls (Language Selector & Theme Toggle) */
 .top-controls {
     display: flex;
@@ -270,16 +282,13 @@ body::before {
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius);
     background: var(--bg-primary);
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
     font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
-    transition: all var(--transition-base);
-    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    box-shadow: none;
     position: relative;
-    overflow: hidden;
     height: 40px;
     display: flex;
     align-items: center;
@@ -291,29 +300,26 @@ body::before {
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 32px;
+    transform: none !important;
+    overflow: visible;
 }
 
-.language-selector::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: var(--accent-gradient);
-    transition: left var(--transition-base);
-    z-index: 0;
+/* Отключаем псевдоэлементы в styles.css тоже */
+.language-selector::before,
+.language-selector::after {
+    display: none !important;
+    content: '' !important;
+    background: none !important;
+    box-shadow: none !important;
 }
 
-.language-selector:hover::before {
-    left: 0;
-}
+/* Псевдоэлемент ::before удален для устранения визуальных артефактов */
 
 .language-selector:hover {
     border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: none;
     background: var(--bg-secondary);
+    transform: none !important;
 }
 
 .language-selector option {
@@ -322,9 +328,7 @@ body::before {
     padding: 8px;
 }
 
-.language-selector:active {
-    transform: translateY(0);
-}
+/* :active transform удален для устранения визуальных артефактов */
 
 /* Поддержка touch событий на мобильных для select (дополнительные стили) */
 .language-selector {

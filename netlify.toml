@@ -16,6 +16,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/iban-config"
+  to = "/.netlify/functions/iban-config"
+  status = 200
+
+[[redirects]]
   from = "/api/callback"
   to = "/.netlify/functions/callback"
   status = 200
@@ -31,11 +36,35 @@
   status = 200
 
 [[redirects]]
+  from = "/payment-success"
+  to = "/payment.html?status=success"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/payment-failed"
+  to = "/payment.html?status=failed"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/iban/success"
+  to = "/iban.html?status=success"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/iban/failure"
+  to = "/iban.html?status=failure"
+  status = 302
+  force = true
+
+[[redirects]]
   from = "/"
-  to = "/payment.html"
+  to = "/index.html"
   status = 200
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/**/*.js"]
+  included_files = ["netlify/functions/**/*.js", "config/**/*.js"]
 
