@@ -199,71 +199,13 @@ window.applyTheme = applyTheme;
 
 // Setup Language Selector
 function setupLanguageSelector() {
-    function setupSelector() {
-        const languageSelector = document.getElementById('languageSelector');
-        if (!languageSelector) {
-            console.warn('Language selector not found');
-            return;
-        }
-        
-        console.log('Setting up language selector');
-        
-        // Автоопределение языка из Telegram или сохраненный выбор
-        const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('paymentLanguage');
-        const userLang = user.language_code?.split('-')[0] || 'en';
-        const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-        const detectedLang = langMap[userLang] || 'en';
-        const currentLang = savedLang || getCurrentLanguage() || detectedLang;
-        languageSelector.value = currentLang;
-        setLanguage(currentLang);
-        
-        // Функция для обработки изменения языка
-        const handleLanguageChange = function(e) {
-            const lang = e.target ? e.target.value : e;
-            console.log('Language selector changed to:', lang);
-            setLanguage(lang);
-            localStorage.setItem('selectedLanguage', lang);
-            localStorage.setItem('paymentLanguage', lang);
-            
-            // Haptic feedback в Telegram Mini App
-            if (tg && tg.HapticFeedback) {
-                try {
-                    tg.HapticFeedback.impactOccurred('light');
-                } catch (err) {
-                    console.warn('Haptic feedback failed:', err);
-                }
-            }
-        };
-        
-        // Удаляем все старые обработчики
-        const newSelector = languageSelector.cloneNode(true);
-        languageSelector.parentNode.replaceChild(newSelector, languageSelector);
-        
-        const selector = document.getElementById('languageSelector');
-        if (!selector) {
-            console.error('Language selector not found after recreation');
-            return;
-        }
-        
-        // Добавляем обработчики с capture для Telegram Mini App
-        selector.addEventListener('change', handleLanguageChange, true);
-        selector.addEventListener('input', handleLanguageChange, true);
-        
-        // Onchange fallback
-        selector.setAttribute('onchange', 'if (typeof window.setLanguage === "function") { const lang = this.value; window.setLanguage(lang); localStorage.setItem("selectedLanguage", lang); localStorage.setItem("paymentLanguage", lang); }');
-        
-        // Делегирование событий
-        const parent = selector.parentElement;
-        if (parent) {
-            parent.addEventListener('change', function(e) {
-                if (e.target && e.target.id === 'languageSelector') {
-                    handleLanguageChange(e);
-                }
-            }, true);
-        }
+    if (typeof window.setLanguage === 'function') {
+        window.setLanguage('tr');
+    } else if (typeof setLanguage === 'function') {
+        setLanguage('tr');
+    } else {
+        updateTranslations();
     }
-    
-    setTimeout(setupSelector, 300);
 }
 
 // Setup Payment Method Buttons

@@ -534,17 +534,17 @@ const translations = {
         ibanAmountLabel: "Ödenecek tutar",
         ibanOrderIdLabel: "Sipariş numarası",
         ibanCommentLabel: "Ödeme açıklaması",
-        ibanOpenPayment: "Ödemeye geç",
-        ibanCopyOrderId: "ID'yi kopyala",
-        ibanStatusLabel: "Ödeme durumu",
-        ibanCheckStatus: "Durumu kontrol et",
-        ibanStatusUnknown: "Durum bilinmiyor",
-        ibanStatusProcessingMessage: "Ödeme işleniyor. Lütfen onayı bekleyin.",
-        ibanStatusCancelledMessage: "Ödeme iptal edildi veya onaylanmadı.",
-        ibanInvoiceError: "Ödeme bilgileri alınamadı. Lütfen daha sonra tekrar deneyin.",
-        ibanRequisitesRefreshing: "Ödeme bilgileri yenileniyor...",
-        ibanStatusFetchError: "Durum alınamadı. Lütfen daha sonra tekrar deneyin.",
-        ibanNoPaymentUrl: "Ödeme sayfası bağlantısı mevcut değil."
+        ibanOpenPayment: "Zur Zahlung",
+        ibanCopyOrderId: "ID kopieren",
+        ibanStatusLabel: "Zahlungsstatus",
+        ibanCheckStatus: "Status prüfen",
+        ibanStatusUnknown: "Status nicht verfügbar",
+        ibanStatusProcessingMessage: "Zahlung wird noch verarbeitet. Bitte warten Sie auf die Bestätigung.",
+        ibanStatusCancelledMessage: "Die Zahlung wurde abgebrochen oder nicht bestätigt.",
+        ibanInvoiceError: "Zahlungsdetails konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
+        ibanRequisitesRefreshing: "Zahlungsdetails werden aktualisiert...",
+        ibanStatusFetchError: "Status konnte nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
+        ibanNoPaymentUrl: "Die Zahlungsseite ist nicht verfügbar."
     },
     de: {
         // Header
@@ -870,10 +870,10 @@ const translations = {
         ibanRequisitesTitle: "Datos de pago",
         ibanRefreshRequisites: "Actualizar",
         ibanNoRequisites: "Los datos de pago no están disponibles por el momento. Contacta con soporte.",
-        ibanRequisitesProcessing: "Los datos de pago se están generando. Actualiza en unos segundos.",
+        ibanRequisitesProcessing: "Los datos de pago se están generando. Atualiza en unos segundos.",
         ibanAmountHint: "El importe se indica en liras turcas (TRY).",
         ibanEmailLabel: "Correo del cliente",
-        ibanGenerateInvoice: "Generar datos",
+        ibanGenerateInvoice: "Generar dados",
         ibanAmountInvalid: "Introduce un importe válido mayor que 0.",
         ibanEmailInvalid: "Introduce un correo electrónico válido.",
         ibanRequisitesPayouIframe: "Los datos de pago están disponibles en el formulario de Payou a continuación. Si no se carga, ábrelo en una nueva pestaña.",
@@ -883,7 +883,7 @@ const translations = {
         ibanInstructionsDescription: "Sigue estos pasos para completar la transferencia.",
         ibanStep1: "Inicia una transferencia desde tu banco o aplicación de pagos.",
         ibanStep2: "Utiliza el IBAN y la referencia proporcionados para asegurar la conciliación automática.",
-        ibanStep3: "Después de enviar los fondos, espera la confirmación por correo electrónico.",
+        ibanStep3: "Después de enviar los fondos, aguarde la confirmación por e-mail.",
         ibanStatusSuccessTitle: "Transferencia confirmada",
         ibanStatusSuccessMessage: "Hemos recibido la confirmación. No se requieren más acciones.",
         ibanStatusFailureTitle: "Transferencia pendiente",
@@ -896,12 +896,12 @@ const translations = {
         ibanAmountLabel: "Importe a pagar",
         ibanOrderIdLabel: "ID del pedido",
         ibanCommentLabel: "Concepto de pago",
-        ibanOpenPayment: "Ir al pago",
+        ibanOpenPayment: "Ir para el pago",
         ibanCopyOrderId: "Copiar ID",
         ibanStatusLabel: "Estado del pago",
         ibanCheckStatus: "Comprobar estado",
         ibanStatusUnknown: "Estado no disponible",
-        ibanStatusProcessingMessage: "El pago sigue en proceso. Espera la confirmación.",
+        ibanStatusProcessingMessage: "El pago aún está en proceso. Espera la confirmación.",
         ibanStatusCancelledMessage: "El pago fue cancelado o no se confirmó.",
         ibanInvoiceError: "No se pudieron obtener los datos de pago. Inténtalo más tarde.",
         ibanRequisitesRefreshing: "Actualizando datos de pago...",
@@ -1093,13 +1093,11 @@ const translations = {
 
 // Функция для получения текущего языка
 function getCurrentLanguage() {
-    return localStorage.getItem('paymentLanguage') || 'tr';
+    return 'tr';
 }
 
 // Функция для установки языка
 function setLanguage(lang) {
-    localStorage.setItem('paymentLanguage', lang);
-    localStorage.setItem('selectedLanguage', lang); // Дублируем для совместимости
     updateTranslations();
     
     // Обновить подсказки и опции после смены языка
@@ -1116,8 +1114,8 @@ window.setLanguage = setLanguage;
 
 // Функция для обновления переводов на странице
 function updateTranslations() {
-    const lang = getCurrentLanguage();
-    const t = translations[lang] || translations.en;
+    const lang = 'tr';
+    const t = translations[lang];
     
     // Обновляем все тексты на странице
     const elements = {
@@ -1190,8 +1188,7 @@ function updateTranslations() {
 
 // Функция для получения перевода
 function t(key) {
-    const lang = getCurrentLanguage();
-    const translation = translations[lang] || translations.en;
+    const translation = translations.tr;
     return translation[key] || key;
 }
 

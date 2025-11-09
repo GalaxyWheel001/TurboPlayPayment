@@ -212,64 +212,13 @@ function updateIbanTranslations() {
 }
 
 function setupLanguageSelector() {
-    const selector = document.getElementById('languageSelector');
-    if (!selector) return;
-
-    const params = state.params || {};
-    const savedLang = localStorage.getItem('paymentLanguage') || localStorage.getItem('selectedLanguage');
-    const userLang = user.language_code?.split('-')[0];
-    const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-    const detected = langMap[userLang] || 'en';
-
-    const availableLangs = Object.keys(window.translations || {});
-    let normalizedUrlLang = null;
-    if (params.lang) {
-        const candidate = params.lang.toLowerCase();
-        if (availableLangs.includes(candidate)) {
-            normalizedUrlLang = candidate;
-        } else if (langMap[candidate]) {
-            normalizedUrlLang = langMap[candidate];
-        }
-    }
-
-    const current = normalizedUrlLang || savedLang || detected;
-
-    selector.value = current;
     if (typeof window.setLanguage === 'function') {
-        window.setLanguage(current);
-    }
-    updateIbanTranslations();
-
-    selector.addEventListener('change', (event) => {
-        const lang = event.target.value;
-        if (typeof window.setLanguage === 'function') {
-            window.setLanguage(lang);
-        }
-        params.lang = lang;
-        const localeMap = {
-            ru: 'ru-RU',
-            tr: 'tr-TR',
-            de: 'de-DE',
-            es: 'es-ES',
-            pt: 'pt-PT',
-            en: 'en-US'
-        };
-        params.locale = localeMap[lang] || params.locale;
-        if (lang === 'tr') {
-            params.currency = 'TRY';
-        } else if (lang === 'ru') {
-            params.currency = params.currency === 'TRY' ? 'RUB' : (params.currency || 'RUB');
-        }
+        window.setLanguage('tr');
+    } else if (typeof setLanguage === 'function') {
+        setLanguage('tr');
+    } else {
         updateIbanTranslations();
-
-        if (tg && tg.HapticFeedback) {
-            try {
-                tg.HapticFeedback.impactOccurred('light');
-            } catch (err) {
-                console.warn('Haptic feedback failed:', err);
-            }
-        }
-    });
+    }
 }
 
 function parseQueryParams() {
