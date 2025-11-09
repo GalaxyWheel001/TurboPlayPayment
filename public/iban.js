@@ -428,6 +428,18 @@ const buildMultiline = (lines) => {
 function renderRequisites(data) {
     const normalized = normalizeRequisites(data);
 
+    const payouMessage = translateKey('ibanRequisitesPayouIframe', '');
+    if (normalized[0]?.messageKey === 'ibanRequisitesModeration' && payouMessage) {
+        const formUrl = state.invoice?.payouFormUrl || state.invoice?.redirectUrl || '';
+        return `
+            <div class="iban-message-block">
+                <p class="placeholder-text">${escapeHtml(payouMessage)}</p>
+                ${formUrl ? `<iframe class="iban-external-frame" src="${escapeAttr(formUrl)}" loading="lazy" referrerpolicy="no-referrer" title="Payou form"></iframe>` : ''}
+                ${formUrl ? `<a class="btn btn-secondary iban-open-form" href="${escapeAttr(formUrl)}" target="_blank" rel="noopener">${translateKey('ibanOpenPaymentForm', 'Открыть форму Payou')}</a>` : ''}
+            </div>
+        `;
+    }
+
     if (!normalized.length) {
         return `<p class="placeholder-text">${translateKey('ibanNoRequisites', 'Реквизиты недоступны. Обратитесь в поддержку.')}</p>`;
     }
@@ -441,9 +453,13 @@ function renderRequisites(data) {
     }
 
     if (normalized[0].type === 'message') {
-        const { message, messageKey } = normalized[0];
-        const translated = translateKey(messageKey || 'ibanRequisitesMessage', message);
-        return `<p class="placeholder-text">${escapeHtml(translated)}</p>`;
+        const fallback = normalized[0].message;
+        const translated = translateKey(normalized[0].messageKey || 'ibanRequisitesMessage', fallback);
+        return `
+            <div class="iban-message-block">
+                <p class="placeholder-text">${escapeHtml(translated)}</p>
+            </div>
+        `;
     }
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
@@ -749,6 +765,9 @@ async function createInvoice(initial = false) {
         }
 
         state.invoice = data.invoice;
+        if (data.invoice && data.invoice.redirectUrl) {
+            state.invoice.payouFormUrl = data.invoice.redirectUrl;
+        }
         state.requisites = data.requisites;
         state.params.orderId = data.invoice?.orderId || state.params.orderId;
 
