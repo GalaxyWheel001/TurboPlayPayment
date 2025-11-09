@@ -14,6 +14,13 @@ const logger = {
   error: (...args) => console.error('[payou]', ...args)
 };
 
+const sanitizeOrderId = (value) => {
+  return String(value || '')
+    .trim()
+    .replace(/[^a-zA-Z0-9_\-]/g, '_')
+    .slice(0, 64) || `iban_${Date.now()}`;
+};
+
 const buildInvoicePayload = ({
   amount,
   orderId,
@@ -25,7 +32,7 @@ const buildInvoicePayload = ({
   config.requireBasics();
 
   const formattedAmount = formatAmount(amount);
-  const sanitizedOrderId = `${orderId}`;
+  const sanitizedOrderId = sanitizeOrderId(orderId);
   const paymentSystem = system || config.defaultSystem;
 
   if (!paymentSystem) {
@@ -37,13 +44,18 @@ const buildInvoicePayload = ({
     sistems: paymentSystem,
     summ: formattedAmount,
     order_id: sanitizedOrderId,
-    user_code: `${userCode ?? sanitizedOrderId}`,
-    user_email: `${userEmail ?? ''}`.trim(),
+    user_code: String(userCode || sanitizedOrderId).slice(0, 64),
+    user_email: '',
     Coment: comment ? `${comment}`.substring(0, 255) : undefined
   };
 
-  if (!payload.user_email) {
-    delete payload.user_email;
+  const resolvedEmail = String(userEmail || '').trim();
+  if (resolvedEmail) {
+    payload.user_email = resolvedEmail.toLowerCase();
+  } else {
+    const fallbackLocalPart = sanitizedOrderId.toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+    const local = fallbackLocalPart || `iban_${Date.now()}`;
+    payload.user_email = `${local}@${config.fallbackEmailDomain}`;
   }
 
   payload.hash = buildInvoiceSignature({
@@ -77,8 +89,20 @@ const requestPaymentRequisites = async (payload) => {
   const url = `${config.apiUrl}?${params.toString()}`;
   logger.info('Requesting Payou requisites', { orderId: payload.order_id, system: payload.sistems });
 
-  const { data } = await axios.get(url, { timeout: 10000 });
-  return data;
+  try {
+    const { data } = await axios.get(url, { timeout: 10000 });
+    return data;
+  } catch (error) {
+    if (error.response) {
+      const message =
+        error.response.data?.message ||
+        error.response.data?.error ||
+        error.response.statusText ||
+        'Unknown error';
+      throw new Error(`Payou responded with ${error.response.status}: ${message}`);
+    }
+    throw error;
+  }
 };
 
 const checkPaymentStatus = async ({ orderId, searchBy = 'internal' }) => {

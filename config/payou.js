@@ -15,7 +15,8 @@ const payouConfig = {
   redirectUrl: 'https://payou.pro/sci/v1/',
   statusUrl: 'https://payou.pro/api/status',
   statusExternalUrl: 'https://payou.pro/api/status2',
-  confirmUrl: 'https://payou.pro/api/new/confirm_payment.php'
+  confirmUrl: 'https://payou.pro/api/new/confirm_payment.php',
+  fallbackEmailDomain: process.env.PAYOU_FALLBACK_EMAIL_DOMAIN || 'turboplay.world'
 };
 
 payouConfig.requireBasics = () => {

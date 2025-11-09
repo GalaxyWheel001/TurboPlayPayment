@@ -224,7 +224,7 @@ function setupLanguageSelector() {
 
 function parseQueryParams() {
     const params = new URLSearchParams(window.location.search);
-    const amountParam = params.get('amount') || params.get('summ') || params.get('sum');
+    const amountParam = params.get('amount') || params.get('summ') || params.get('sum') || '2400';
     const amount = formatAmountValue(amountParam);
     const rawCurrency = params.get('currency') || params.get('cur') || 'RUB';
 
@@ -608,14 +608,6 @@ function startStatusPolling() {
 
 function bootstrapInvoiceFlow() {
     state.params = parseQueryParams();
-
-    if (!state.params.amount) {
-        setWidgetMessage(
-            translateKey('ibanMissingAmount', 'Не указана сумма платежа. Свяжитесь со службой поддержки.'),
-            'error'
-        );
-        return;
-    }
 
     if (state.params.initialStatus) {
         state.status = { status: state.params.initialStatus };
