@@ -326,9 +326,17 @@ const buildMultiline = (lines) => {
         if (sorted.every((value) => value.length <= 2)) {
             const combined = sorted.join('').trim();
             if (combined.length) {
+                const normalizedMessage = combined.toLowerCase();
+                let messageKey = 'ibanRequisitesMessage';
+                if (normalizedMessage.includes('moder')) {
+                    messageKey = 'ibanRequisitesModeration';
+                } else if (normalizedMessage.includes('error')) {
+                    messageKey = 'ibanRequisitesErrorMessage';
+                }
                 return [{
                     type: 'message',
-                    message: combined
+                    message: combined,
+                    messageKey
                 }];
             }
         }
@@ -360,7 +368,9 @@ function renderRequisites(data) {
     }
 
     if (normalized[0].type === 'message') {
-        return `<p class="placeholder-text">${escapeHtml(normalized[0].message)}</p>`;
+        const { message, messageKey } = normalized[0];
+        const translated = translateKey(messageKey || 'ibanRequisitesMessage', message);
+        return `<p class="placeholder-text">${escapeHtml(translated)}</p>`;
     }
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
