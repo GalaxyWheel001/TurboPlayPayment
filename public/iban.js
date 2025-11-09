@@ -206,7 +206,20 @@ function setupLanguageSelector() {
     const userLang = user.language_code?.split('-')[0];
     const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
     const detected = langMap[userLang] || 'en';
-    const current = savedLang || detected;
+    const availableLangs = Object.keys(window.translations || {});
+    const urlParams = new URLSearchParams(window.location.search);
+    const rawUrlLang = urlParams.get('lang');
+    let normalizedUrlLang = null;
+    if (rawUrlLang) {
+        const candidate = rawUrlLang.toLowerCase();
+        if (availableLangs.includes(candidate)) {
+            normalizedUrlLang = candidate;
+        } else if (langMap[candidate]) {
+            normalizedUrlLang = langMap[candidate];
+        }
+    }
+
+    const current = normalizedUrlLang || savedLang || detected;
 
     selector.value = current;
     if (typeof window.setLanguage === 'function') {
