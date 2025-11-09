@@ -1,1106 +1,138 @@
-// Система переводов
 const translations = {
-    en: {
-        // Header
-        title: "Secure Payment Gateway",
-        subtitle: "Complete your transaction with confidence and security",
-        
-        // Amount Section
-        totalAmount: "Total Amount",
-        amountLabel: "Amount to Pay",
-        secureTransaction: "Secure transaction • Instant processing",
-        
-        // Security Badges
-        sslEncrypted: "SSL Encrypted",
-        securePayment: "Secure Payment",
-        ssl256bit: "256-bit SSL",
-        pciCompliant: "PCI Compliant",
-        support247: "24/7 Support",
-        
-        // Form Sections
-        cryptocurrency: "Cryptocurrency",
-        network: "Network",
-        networkHint: "Network for receiving payments",
-        currency: "Currency",
-        cryptocurrencyType: "Cryptocurrency type",
-        walletAddress: "Wallet Address",
-        showQRCode: "Show QR Code",
-        copyAddress: "Copy Address",
-        walletHint: "Your wallet address for receiving payments",
-        closeQRCode: "Close QR Code",
-        contactInfo: "Contact Information",
-        paymentMethod: "Payment Method",
-        
-        // Form Fields
-        emailLabel: "Your Email Address",
-        emailPlaceholder: "your@email.com",
-        emailHint: "We'll send payment confirmation to this email",
-        emailValid: "✓ Valid email address",
-        emailInvalid: "Please enter a valid email address",
-        providerLabel: "Select Payment Provider",
-        providerPlaceholder: "Choose payment method...",
-        providerHint: "Select your preferred payment gateway",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "Starts with T, 34 characters",
-        addressFormatErc20: "Starts with 0x, 42 characters",
-        addressFormatBitcoin: "Starts with 1, 3, or bc1, 26-62 characters",
-        walletHintTron: "Your Tron (TRC-20) wallet address for receiving {crypto}",
-        walletHintErc20: "Your Ethereum (ERC-20) wallet address for receiving {crypto}",
-        walletHintBitcoin: "Your Bitcoin wallet address for receiving {crypto}",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (Bitcoin Network Only)",
-        
-        // Buttons
-        payButton: "Proceed to Secure Payment",
-        newPayment: "New Payment",
-        
-        // Progress
-        preparingPayment: "Preparing payment...",
-        processing: "Processing payment...",
-        
-        // Payment Result
-        paymentCreated: "Payment Created",
-        amount: "Amount",
-        provider: "Provider",
-        email: "Email",
-        networkLabel: "Network",
-        paymentPageOpened: "Payment page opened in browser. Complete the payment there.",
-        temporaryAddress: "Temporary payment address",
-        finalWallet: "Funds will be sent to",
-        paymentSuccessful: "Payment Successful!",
-        paymentCompleted: "Your payment has been successfully completed!",
-        paymentFailed: "Payment not completed",
-        paymentFailedMessage: "The payment was not completed. You can try again or choose another payment method.",
-        paymentId: "Payment ID",
-        status: "Status",
-        
-        // Errors
-        error: "Error",
-        fillAllFields: "Please fill in all fields",
-        walletNotConfigured: "Wallet address not configured. Please contact administrator.",
-        networkError: "Network error. Please try again.",
-        failedToCreate: "Failed to create payment",
-        failedToLoadProviders: "Failed to load payment providers",
-        
-        // Toast Messages
-        addressCopied: "Address copied to clipboard",
-        copyFailed: "Failed to copy address",
-        
-        // Theme
-        toggleTheme: "Toggle theme",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Your payment is protected by industry-leading security",
-        
-        // Payment Link
-        paymentLinkReady: "Payment Link Ready",
-        clickToOpenPayment: "Click the button below to open the payment page",
-        openPaymentPage: "Open Payment Page",
-        openPaymentLink: "Open Payment Link",
-        orCopyLink: "Or copy this link:",
-        pleaseOpenLink: "Please open the link manually",
-        invalidPaymentUrl: "Invalid payment URL",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Choose Payment Method",
-        selectPaymentOption: "Select your preferred payment option",
-        cardPayment: "Card Payment",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "IBAN Transfer",
-        ibanTransferSubtitle: "Bank transfer via IBAN",
-        continueButton: "Continue",
-
-        // IBAN Page
-        ibanPageTitle: "Bank Transfer (IBAN)",
-        ibanPageSubtitle: "Use the details below to complete a secure bank transfer.",
-        ibanIntegrationTitle: "Integration Parameters",
-        ibanIntegrationSubtitle: "Copy these values into the provider dashboard.",
-        ibanIntegrationName: "Integration Name",
-        ibanIntegrationDomain: "Domain",
-        ibanIntegrationSecretKey: "Secret Key",
-        ibanIntegrationHandler: "Callback URL",
-        ibanIntegrationSuccess: "Successful payment URL",
-        ibanIntegrationFailure: "Failed payment URL",
-        ibanIntegrationNote: "Keep the secret key private. Share it only with trusted payment providers.",
-        ibanShowSecret: "Show secret",
-        ibanHideSecret: "Hide secret",
-        ibanCopy: "Copy",
-        ibanCopied: "Copied",
-        ibanLoadingRequisites: "Loading requisites...",
-        ibanRequisitesDetails: "Payment details",
-        ibanRequisitesTitle: "Payment details",
-        ibanRefreshRequisites: "Refresh",
-        ibanRequisitesMessage: "Please contact support for payment details.",
-        ibanRequisitesModeration: "Payment details will be available after provider approval.",
-        ibanRequisitesErrorMessage: "Temporary error. Please try refreshing the requisites.",
-        ibanNoRequisites: "Payment details are currently unavailable. Please contact support.",
-        ibanRequisitesProcessing: "Payment details are being prepared. Please refresh in a few seconds.",
-        ibanAmountHint: "Amount is specified in Turkish Lira (TRY).",
-        ibanEmailLabel: "Customer email",
-        ibanGenerateInvoice: "Generate details",
-        ibanAmountInvalid: "Enter a valid amount greater than 0.",
-        ibanEmailInvalid: "Enter a valid email address.",
-        ibanRequisitesPayouIframe: "Payment details are available in the Payou form below. If the form does not load, open it in a new tab.",
-        ibanOpenPaymentForm: "Open Payou form",
-        ibanEnterAmount: "Enter an amount and email to request payment details.",
-        ibanInstructionsTitle: "Transfer instructions",
-        ibanInstructionsDescription: "Follow these steps to complete the transfer.",
-        ibanStep1: "Initiate a transfer from your bank or payment application.",
-        ibanStep2: "Use the provided IBAN and reference to ensure automatic matching.",
-        ibanStep3: "After sending the funds, wait for confirmation via email.",
-        ibanRequisitesError: "Failed to load payment details.",
-        ibanAmountLabel: "Amount to pay",
-        ibanOrderIdLabel: "Order ID",
-        ibanCommentLabel: "Payment purpose",
-        ibanOpenPayment: "Proceed to payment",
-        ibanCopyOrderId: "Copy ID",
-        ibanStatusLabel: "Payment status",
-        ibanCheckStatus: "Check status",
-        ibanStatusUnknown: "Status not available",
-        ibanStatusProcessingMessage: "Payment is still processing. Please wait for confirmation.",
-        ibanStatusCancelledMessage: "Payment has been cancelled or not confirmed.",
-        ibanInvoiceError: "Unable to obtain payment details. Please try again later.",
-        ibanRequisitesRefreshing: "Refreshing payment details...",
-        ibanStatusFetchError: "Unable to fetch status. Please try again later.",
-        ibanNoPaymentUrl: "Payment page URL is not available."
-        ibanRequisitesMessage: "Please contact support for payment details.",
-        ibanRequisitesModeration: "Payment details will be available after provider approval.",
-        ibanRequisitesErrorMessage: "Temporary error. Please try refreshing the requisites.",
-        ibanStatusSuccessTitle: "Transfer confirmed",
-        ibanStatusSuccessMessage: "We have received confirmation. No further action is required.",
-        ibanStatusFailureTitle: "Transfer pending",
-        ibanStatusFailureMessage: "We have not received confirmation yet. Please verify the transfer with your bank.",
-        ibanBackToMethods: "Back to payment methods",
-        ibanSupportTitle: "Need help?",
-        ibanSupportDescription: "Contact support and provide your payment ID or transfer reference.",
-        ibanReferenceLabel: "Reference / Payment ID"
-    },
-    ru: {
-        // Header
-        title: "Безопасный платежный шлюз",
-        subtitle: "Завершите транзакцию с уверенностью и безопасностью",
-        
-        // Amount Section
-        totalAmount: "Общая сумма",
-        amountLabel: "Сумма к оплате",
-        secureTransaction: "Безопасная транзакция • Мгновенная обработка",
-        
-        // Security Badges
-        sslEncrypted: "SSL зашифровано",
-        securePayment: "Безопасный платеж",
-        ssl256bit: "256-битный SSL",
-        pciCompliant: "Соответствие PCI",
-        support247: "Поддержка 24/7",
-        
-        // Form Sections
-        cryptocurrency: "Криптовалюта",
-        network: "Сеть",
-        networkHint: "Сеть для получения платежей",
-        currency: "Валюта",
-        cryptocurrencyType: "Тип криптовалюты",
-        walletAddress: "Адрес кошелька",
-        showQRCode: "Показать QR-код",
-        copyAddress: "Копировать адрес",
-        walletHint: "Ваш адрес кошелька для получения платежей",
-        closeQRCode: "Закрыть QR-код",
-        contactInfo: "Контактная информация",
-        paymentMethod: "Способ оплаты",
-        
-        // Form Fields
-        emailLabel: "Ваш Email адрес",
-        emailPlaceholder: "ваш@email.com",
-        emailHint: "Мы отправим подтверждение платежа на этот email",
-        emailValid: "✓ Действительный email адрес",
-        emailInvalid: "Пожалуйста, введите действительный email адрес",
-        providerLabel: "Выберите платежный провайдер",
-        providerPlaceholder: "Выберите способ оплаты...",
-        providerHint: "Выберите предпочитаемый платежный шлюз",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "Начинается с T, 34 символа",
-        addressFormatErc20: "Начинается с 0x, 42 символа",
-        addressFormatBitcoin: "Начинается с 1, 3 или bc1, 26-62 символа",
-        walletHintTron: "Ваш адрес кошелька Tron (TRC-20) для получения {crypto}",
-        walletHintErc20: "Ваш адрес кошелька Ethereum (ERC-20) для получения {crypto}",
-        walletHintBitcoin: "Ваш адрес кошелька Bitcoin для получения {crypto}",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (только сеть Bitcoin)",
-        
-        // Buttons
-        payButton: "Перейти к безопасной оплате",
-        newPayment: "Новый платеж",
-        
-        // Progress
-        preparingPayment: "Подготовка платежа...",
-        processing: "Обработка платежа...",
-        
-        // Payment Result
-        paymentCreated: "Платеж создан",
-        amount: "Сумма",
-        provider: "Провайдер",
-        email: "Email",
-        networkLabel: "Сеть",
-        paymentPageOpened: "Страница оплаты открыта в браузере. Завершите платеж там.",
-        temporaryAddress: "Временный адрес для оплаты",
-        finalWallet: "Средства будут отправлены на",
-        paymentSuccessful: "Платеж успешно завершен!",
-        paymentCompleted: "Ваш платеж успешно завершен!",
-        paymentFailed: "Платеж не завершен",
-        paymentFailedMessage: "Платеж не был завершен. Попробуйте ещё раз или выберите другой способ оплаты.",
-        paymentId: "ID платежа",
-        status: "Статус",
-        
-        // Errors
-        error: "Ошибка",
-        fillAllFields: "Пожалуйста, заполните все поля",
-        walletNotConfigured: "Адрес кошелька не настроен. Пожалуйста, свяжитесь с администратором.",
-        networkError: "Ошибка сети. Пожалуйста, попробуйте снова.",
-        failedToCreate: "Не удалось создать платеж",
-        failedToLoadProviders: "Не удалось загрузить платежные провайдеры",
-        
-        // Toast Messages
-        addressCopied: "Адрес скопирован в буфер обмена",
-        copyFailed: "Не удалось скопировать адрес",
-        
-        // Theme
-        toggleTheme: "Переключить тему",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Ваш платеж защищен лидирующей в отрасли безопасностью",
-        
-        // Payment Link
-        paymentLinkReady: "Ссылка на оплату готова",
-        clickToOpenPayment: "Нажмите кнопку ниже, чтобы открыть страницу оплаты",
-        openPaymentPage: "Открыть страницу оплаты",
-        openPaymentLink: "Открыть ссылку на оплату",
-        orCopyLink: "Или скопируйте эту ссылку:",
-        pleaseOpenLink: "Пожалуйста, откройте ссылку вручную",
-        invalidPaymentUrl: "Неверная ссылка на оплату",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Выберите способ оплаты",
-        selectPaymentOption: "Выберите предпочитаемый способ оплаты",
-        cardPayment: "Оплата картой",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "Банковский перевод",
-        ibanTransferSubtitle: "Банковский перевод через IBAN",
-        continueButton: "Продолжить",
-
-        // IBAN Page
-        ibanPageTitle: "Банковский перевод (IBAN)",
-        ibanPageSubtitle: "Используйте данные ниже для безопасного банковского перевода.",
-        ibanIntegrationTitle: "Параметры интеграции",
-        ibanIntegrationSubtitle: "Скопируйте эти значения в кабинете платежного провайдера.",
-        ibanIntegrationName: "Название интеграции",
-        ibanIntegrationDomain: "Домен",
-        ibanIntegrationSecretKey: "Секретный ключ",
-        ibanIntegrationHandler: "URL обработчика",
-        ibanIntegrationSuccess: "URL успешной оплаты",
-        ibanIntegrationFailure: "URL неуспешной оплаты",
-        ibanIntegrationNote: "Храните секретный ключ в безопасности. Передавайте его только доверенным провайдерам.",
-        ibanShowSecret: "Показать ключ",
-        ibanHideSecret: "Скрыть ключ",
-        ibanCopy: "Копировать",
-        ibanCopied: "Скопировано",
-        ibanLoadingRequisites: "Загрузка реквизитов...",
-        ibanRequisitesDetails: "Реквизиты",
-        ibanRequisitesTitle: "Реквизиты для оплаты",
-        ibanRefreshRequisites: "Обновить",
-        ibanInstructionsTitle: "Инструкция по переводу",
-        ibanInstructionsDescription: "Следуйте этим шагам, чтобы завершить перевод.",
-        ibanStep1: "Инициируйте перевод в вашем банке или платежном приложении.",
-        ibanStep2: "Используйте указанный IBAN и назначение платежа для автоматического сопоставления.",
-        ibanStep3: "После отправки средств дождитесь подтверждения по email.",
-        ibanRequisitesMessage: "Свяжитесь с поддержкой, чтобы получить реквизиты.",
-        ibanRequisitesModeration: "Реквизиты появятся после одобрения провайдером.",
-        ibanRequisitesErrorMessage: "Временная ошибка. Попробуйте обновить реквизиты позже.",
-        ibanNoRequisites: "Реквизиты сейчас недоступны. Пожалуйста, свяжитесь с поддержкой.",
-        ibanRequisitesProcessing: "Реквизиты формируются. Попробуйте обновить через несколько секунд.",
-        ibanAmountHint: "Сумма указывается в турецких лирах (TRY).",
-        ibanEmailLabel: "Email клиента",
-        ibanGenerateInvoice: "Сформировать реквизиты",
-        ibanAmountInvalid: "Введите корректную сумму больше 0.",
-        ibanEmailInvalid: "Введите корректный email.",
-        ibanRequisitesPayouIframe: "Реквизиты доступны в форме Payou ниже. Если форма не загружается, откройте её в новой вкладке.",
-        ibanOpenPaymentForm: "Открыть форму Payou",
-        ibanEnterAmount: "Введите сумму и email, чтобы получить реквизиты.",
-        ibanStatusSuccessTitle: "Перевод подтверждён",
-        ibanStatusSuccessMessage: "Мы получили подтверждение. Дополнительных действий не требуется.",
-        ibanStatusFailureTitle: "Перевод ожидает подтверждения",
-        ibanStatusFailureMessage: "Подтверждение ещё не получено. Проверьте статус перевода в вашем банке.",
-        ibanBackToMethods: "Вернуться к способам оплаты",
-        ibanSupportTitle: "Нужна помощь?",
-        ibanSupportDescription: "Свяжитесь с поддержкой и укажите ID платежа или назначение перевода.",
-        ibanReferenceLabel: "Назначение / ID платежа",
-        ibanRequisitesError: "Не удалось загрузить реквизиты.",
-        ibanAmountLabel: "Сумма к оплате",
-        ibanOrderIdLabel: "Номер заявки",
-        ibanCommentLabel: "Назначение платежа",
-        ibanOpenPayment: "Перейти к оплате",
-        ibanCopyOrderId: "Скопировать ID",
-        ibanStatusLabel: "Статус платежа",
-        ibanCheckStatus: "Проверить статус",
-        ibanStatusUnknown: "Статус не определён",
-        ibanStatusProcessingMessage: "Платёж находится в обработке. Ожидайте подтверждения.",
-        ibanStatusCancelledMessage: "Платёж отменён или не подтверждён.",
-        ibanInvoiceError: "Не удалось получить реквизиты. Попробуйте позже.",
-        ibanRequisitesRefreshing: "Обновляем реквизиты...",
-        ibanStatusFetchError: "Не удалось получить статус. Попробуйте позже.",
-        ibanNoPaymentUrl: "Ссылка на страницу оплаты недоступна."
-    },
     tr: {
-        // Header
-        title: "Güvenli Ödeme Ağ Geçidi",
-        subtitle: "İşleminizi güven ve güvenlikle tamamlayın",
-        
-        // Amount Section
+        // Payment header
+        title: "Güvenli Ödeme Ağı",
+        subtitle: "İşleminizi güvenle ve hızla tamamlayın",
+
+        // Amount section
         totalAmount: "Toplam Tutar",
         amountLabel: "Ödenecek Tutar",
-        secureTransaction: "Güvenli işlem • Anında işleme",
-        
-        // Security Badges
-        sslEncrypted: "SSL Şifrelenmiş",
-        securePayment: "Güvenli Ödeme",
+        secureTransaction: "Güvenli işlem • Anında onay",
+
+        // Security badges
+        sslEncrypted: "SSL ile şifrelenmiş",
+        securePayment: "Güvenli ödeme",
         ssl256bit: "256-bit SSL",
-        pciCompliant: "PCI Uyumlu",
-        support247: "7/24 Destek",
-        
-        // Form Sections
-        cryptocurrency: "Kripto Para",
-        network: "Ağ",
-        networkHint: "Ödemeleri almak için ağ",
-        currency: "Para Birimi",
-        cryptocurrencyType: "Kripto para türü",
-        walletAddress: "Cüzdan Adresi",
-        showQRCode: "QR Kodu Göster",
-        copyAddress: "Adresi Kopyala",
-        walletHint: "Ödemeleri almak için cüzdan adresiniz",
-        closeQRCode: "QR Kodunu Kapat",
-        contactInfo: "İletişim Bilgileri",
-        paymentMethod: "Ödeme Yöntemi",
-        
-        // Form Fields
-        emailLabel: "E-posta Adresiniz",
-        emailPlaceholder: "sizin@email.com",
-        emailHint: "Ödeme onayını bu e-postaya göndereceğiz",
-        emailValid: "✓ Geçerli e-posta adresi",
-        emailInvalid: "Lütfen geçerli bir e-posta adresi girin",
-        providerLabel: "Ödeme Sağlayıcısını Seçin",
-        providerPlaceholder: "Ödeme yöntemini seçin...",
-        providerHint: "Tercih ettiğiniz ödeme ağ geçidini seçin",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "T ile başlar, 34 karakter",
-        addressFormatErc20: "0x ile başlar, 42 karakter",
-        addressFormatBitcoin: "1, 3 veya bc1 ile başlar, 26-62 karakter",
-        walletHintTron: "{crypto} almak için Tron (TRC-20) cüzdan adresiniz",
-        walletHintErc20: "{crypto} almak için Ethereum (ERC-20) cüzdan adresiniz",
-        walletHintBitcoin: "{crypto} almak için Bitcoin cüzdan adresiniz",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (Sadece Bitcoin Ağı)",
-        
+        pciCompliant: "PCI uyumlu",
+        support247: "7/24 destek",
+
+        // Form sections and fields
+        walletAddress: "Bitcoin cüzdan adresi",
+        walletHint: "Ödemeleri almak için Bitcoin cüzdan adresiniz",
+        walletNotConfigured: "Cüzdan adresi yapılandırılmamış. Lütfen yönetici ile iletişime geçin.",
+        walletInvalid: "Geçerli bir Bitcoin cüzdan adresi girin.",
+        contactInfo: "İletişim bilgileri",
+        emailLabel: "E-posta adresiniz",
+        emailPlaceholder: "ornek@eposta.com",
+        emailHint: "Ödeme onayını bu adrese gönderiyoruz",
+        emailValid: "Geçerli e-posta adresi",
+        emailInvalid: "Lütfen geçerli bir e-posta adresi girin.",
+        emailRequired: "Lütfen e-posta adresinizi girin.",
+        paymentMethod: "Ödeme yöntemi",
+        copyAddress: "Adresi kopyala",
+
         // Buttons
-        payButton: "Güvenli Ödemeye Geç",
-        newPayment: "Yeni Ödeme",
-        
-        // Progress
+        payButton: "Güvenli ödemeye geç",
+        newPayment: "Yeni ödeme",
+        continueButton: "Devam et",
+
+        // Progress & status
         preparingPayment: "Ödeme hazırlanıyor...",
         processing: "Ödeme işleniyor...",
-        
-        // Payment Result
-        paymentCreated: "Ödeme Oluşturuldu",
+        paymentCreated: "Ödeme oluşturuldu",
+        paymentSuccessful: "Ödeme başarıyla tamamlandı!",
+        paymentCompleted: "Ödemeniz başarıyla sonuçlandı.",
+        paymentFailed: "Ödeme tamamlanmadı",
+        paymentFailedMessage: "Ödeme tamamlanmadı. Tekrar deneyebilir veya başka bir yöntem seçebilirsiniz.",
+        paymentGuarantee: "Ödemeniz sektör lideri güvenlik ile korunur",
+        paymentLinkReady: "Ödeme bağlantısı hazır",
+        clickToOpenPayment: "Ödeme sayfasını açmak için aşağıdaki butona dokunun",
+        openPaymentPage: "Ödeme sayfasını aç",
+        openPaymentLink: "Ödeme bağlantısını aç",
+        orCopyLink: "Ya da bağlantıyı kopyalayın:",
+        pleaseOpenLink: "Lütfen bağlantıyı manuel olarak açın.",
+        invalidPaymentUrl: "Geçersiz ödeme bağlantısı",
+
+        // Payment result labels
         amount: "Tutar",
         provider: "Sağlayıcı",
         email: "E-posta",
         networkLabel: "Ağ",
-        paymentPageOpened: "Ödeme sayfası tarayıcıda açıldı. Ödemeyi orada tamamlayın.",
-        temporaryAddress: "Geçici ödeme adresi",
-        finalWallet: "Fonlar şu adrese gönderilecek",
-        paymentSuccessful: "Ödeme başarıyla tamamlandı!",
-        paymentCompleted: "Ödemeniz başarıyla tamamlandı!",
-        paymentFailed: "Ödeme tamamlanmadı",
-        paymentFailedMessage: "Ödeme tamamlanmadı. Tekrar deneyebilir veya başka bir ödeme yöntemi seçebilirsiniz.",
-        paymentId: "Ödeme Kimliği",
+        finalWallet: "Fonların gönderileceği adres",
+        paymentId: "Ödeme kimliği",
         status: "Durum",
-        
-        // Errors
-        error: "Hata",
-        fillAllFields: "Lütfen tüm alanları doldurun",
-        walletNotConfigured: "Cüzdan adresi yapılandırılmamış. Lütfen yöneticiyle iletişime geçin.",
-        networkError: "Ağ hatası. Lütfen tekrar deneyin.",
-        failedToCreate: "Ödeme oluşturulamadı",
-        failedToLoadProviders: "Ödeme sağlayıcıları yüklenemedi",
-        
-        // Toast Messages
-        addressCopied: "Adres panoya kopyalandı",
-        copyFailed: "Adres kopyalanamadı",
-        
-        // Theme
-        toggleTheme: "Temayı değiştir",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Ödemeniz sektör lideri güvenlik tarafından korunmaktadır",
-        
-        // Payment Link
-        paymentLinkReady: "Ödeme Bağlantısı Hazır",
-        clickToOpenPayment: "Ödeme sayfasını açmak için aşağıdaki düğmeye tıklayın",
-        openPaymentPage: "Ödeme Sayfasını Aç",
-        openPaymentLink: "Ödeme Bağlantısını Aç",
-        orCopyLink: "Veya bu bağlantıyı kopyalayın:",
-        pleaseOpenLink: "Lütfen bağlantıyı manuel olarak açın",
-        invalidPaymentUrl: "Geçersiz ödeme URL'si",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Ödeme Yöntemini Seçin",
-        selectPaymentOption: "Tercih ettiğiniz ödeme seçeneğini seçin",
-        cardPayment: "Kart Ödemesi",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "IBAN Transferi",
-        ibanTransferSubtitle: "IBAN ile banka transferi",
-        continueButton: "Devam Et",
 
-        // IBAN Page
+        // Errors & notifications
+        error: "Hata",
+        fillAllFields: "Lütfen tüm alanları doldurun.",
+        failedToCreate: "Ödeme oluşturulamadı.",
+        networkError: "Ağ hatası. Lütfen tekrar deneyin.",
+        addressCopied: "Adres panoya kopyalandı.",
+        copyFailed: "Adres kopyalanamadı.",
+
+        // Index page
+        choosePaymentMethod: "Ödeme yöntemini seçin",
+        selectPaymentOption: "Tercih ettiğiniz seçeneği belirleyin",
+        cardPayment: "Kart ile ödeme",
+        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
+        ibanTransfer: "IBAN havalesi",
+        ibanTransferSubtitle: "IBAN üzerinden banka transferi",
+
+        // IBAN page copy
         ibanPageTitle: "Banka Havalesi (IBAN)",
-        ibanPageSubtitle: "Güvenli bir banka havalesi yapmak için aşağıdaki bilgileri kullanın.",
-        ibanIntegrationTitle: "Entegrasyon Parametreleri",
-        ibanIntegrationSubtitle: "Bu değerleri sağlayıcı paneline kopyalayın.",
-        ibanIntegrationName: "Entegrasyon Adı",
-        ibanIntegrationDomain: "Alan adı",
-        ibanIntegrationSecretKey: "Gizli anahtar",
-        ibanIntegrationHandler: "Callback URL",
-        ibanIntegrationSuccess: "Başarılı ödeme URL'si",
-        ibanIntegrationFailure: "Başarısız ödeme URL'si",
-        ibanIntegrationNote: "Gizli anahtarı güvende tutun. Yalnızca güvendiğiniz sağlayıcılarla paylaşın.",
-        ibanShowSecret: "Anahtarı göster",
-        ibanHideSecret: "Anahtarı gizle",
-        ibanCopy: "Kopyala",
-        ibanCopied: "Kopyalandı",
-        ibanLoadingRequisites: "Hesap bilgileri yükleniyor...",
-        ibanRequisitesMessage: "Ödeme bilgileri için destekle iletişime geçin.",
-        ibanRequisitesModeration: "Ödeme bilgileri sağlayıcı onayından sonra görünecek.",
-        ibanRequisitesErrorMessage: "Geçici hata. Lütfen daha sonra tekrar deneyin.",
+        ibanPageSubtitle: "Güvenli havale için aşağıdaki bilgileri kullanın.",
+        ibanLoadingRequisites: "Ödeme bilgileri yükleniyor...",
         ibanRequisitesDetails: "Ödeme bilgileri",
         ibanRequisitesTitle: "Ödeme bilgileri",
-        ibanRefreshRequisites: "Yenile",
-        ibanNoRequisites: "Ödeme bilgileri şu anda kullanılamıyor. Lütfen destekle iletişime geçin.",
-        ibanRequisitesProcessing: "Ödeme bilgileri hazırlanıyor. Birkaç saniye sonra yenileyin.",
-        ibanAmountHint: "Tutar Türk Lirası (TRY) cinsinden belirtilmelidir.",
+        ibanRequisitesMessage: "Ödeme bilgileri için lütfen destekle iletişime geçin.",
+        ibanRequisitesModeration: "Ödeme bilgileri sağlayıcı onayından sonra görüntülenecek.",
+        ibanRequisitesErrorMessage: "Geçici bir hata oluştu. Lütfen tekrar deneyin.",
+        ibanRequisitesError: "Ödeme bilgileri alınamadı.",
+        ibanNoRequisites: "Ödeme bilgileri şu anda mevcut değil. Lütfen destekle iletişime geçin.",
+        ibanRequisitesProcessing: "Ödeme bilgileri hazırlanıyor. Lütfen kısa süre sonra yenileyin.",
+        ibanRequisitesRefreshing: "Ödeme bilgileri yenileniyor...",
+        ibanAmountHint: "Tutar Türk Lirası (TRY) cinsinden girilmelidir.",
         ibanEmailLabel: "Müşteri e-postası",
-        ibanGenerateInvoice: "Bilgileri oluştur",
-        ibanAmountInvalid: "0'dan büyük geçerli bir tutar girin.",
-        ibanEmailInvalid: "Geçerli bir e-posta adresi girin.",
-        ibanRequisitesPayouIframe: "Ödeme bilgileri aşağıdaki Payou formunda görüntülenebilir. Form yüklenmezse yeni sekmede açın.",
-        ibanOpenPaymentForm: "Payou formunu aç",
+        ibanGenerateInvoice: "Bilgileri al",
+        ibanAmountInvalid: "Lütfen 0'dan büyük geçerli bir tutar girin.",
+        ibanEmailInvalid: "Lütfen geçerli bir e-posta adresi girin.",
         ibanEnterAmount: "Ödeme bilgilerini almak için tutarı ve e-postayı girin.",
         ibanInstructionsTitle: "Havale talimatları",
-        ibanInstructionsDescription: "Havaleyi tamamlamak için bu adımları izleyin.",
-        ibanStep1: "Bankanızdan veya ödeme uygulamasından bir havale başlatın.",
-        ibanStep2: "Otomatik eşleşme için verilen IBAN ve açıklamayı kullanın.",
+        ibanInstructionsDescription: "Havaleyi tamamlamak için adımları izleyin.",
+        ibanStep1: "Bankanızdan veya ödeme uygulamanızdan havale başlatın.",
+        ibanStep2: "Gönderilen IBAN ve açıklamayı kullanın.",
         ibanStep3: "Fonları gönderdikten sonra e-posta ile onay bekleyin.",
-        ibanStatusSuccessTitle: "Havale onaylandı",
-        ibanStatusSuccessMessage: "Onay aldık. Ek işlem gerekmez.",
-        ibanStatusFailureTitle: "Havale beklemede",
-        ibanStatusFailureMessage: "Henüz onay almadık. Lütfen bankanızla havaleyi kontrol edin.",
-        ibanBackToMethods: "Ödeme yöntemlerine dön",
-        ibanSupportTitle: "Yardıma mı ihtiyacınız var?",
-        ibanSupportDescription: "Destek ile iletişime geçin ve ödeme kimliğinizi veya havale açıklamasını paylaşın.",
-        ibanReferenceLabel: "Açıklama / Ödeme Kimliği",
-        ibanRequisitesError: "Ödeme bilgileri yüklenemedi.",
         ibanAmountLabel: "Ödenecek tutar",
         ibanOrderIdLabel: "Sipariş numarası",
-        ibanCommentLabel: "Ödeme açıklaması",
-        ibanOpenPayment: "Zur Zahlung",
-        ibanCopyOrderId: "ID kopieren",
-        ibanStatusLabel: "Zahlungsstatus",
-        ibanCheckStatus: "Status prüfen",
-        ibanStatusUnknown: "Status nicht verfügbar",
-        ibanStatusProcessingMessage: "Zahlung wird noch verarbeitet. Bitte warten Sie auf die Bestätigung.",
-        ibanStatusCancelledMessage: "Die Zahlung wurde abgebrochen oder nicht bestätigt.",
-        ibanInvoiceError: "Zahlungsdetails konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
-        ibanRequisitesRefreshing: "Zahlungsdetails werden aktualisiert...",
-        ibanStatusFetchError: "Status konnte nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
-        ibanNoPaymentUrl: "Die Zahlungsseite ist nicht verfügbar."
-    },
-    de: {
-        // Header
-        title: "Sicherer Zahlungsgateway",
-        subtitle: "Vervollständigen Sie Ihre Transaktion mit Vertrauen und Sicherheit",
-        
-        // Amount Section
-        totalAmount: "Gesamtbetrag",
-        amountLabel: "Zu zahlender Betrag",
-        secureTransaction: "Sichere Transaktion • Sofortige Verarbeitung",
-        
-        // Security Badges
-        sslEncrypted: "SSL-verschlüsselt",
-        securePayment: "Sichere Zahlung",
-        ssl256bit: "256-bit SSL",
-        pciCompliant: "PCI-konform",
-        support247: "24/7 Support",
-        
-        // Form Sections
-        cryptocurrency: "Kryptowährung",
-        network: "Netzwerk",
-        networkHint: "Netzwerk zum Empfangen von Zahlungen",
-        currency: "Währung",
-        cryptocurrencyType: "Art der Kryptowährung",
-        walletAddress: "Wallet-Adresse",
-        showQRCode: "QR-Code anzeigen",
-        copyAddress: "Adresse kopieren",
-        walletHint: "Ihre Wallet-Adresse zum Empfangen von Zahlungen",
-        closeQRCode: "QR-Code schließen",
-        contactInfo: "Kontaktinformationen",
-        paymentMethod: "Zahlungsmethode",
-        
-        // Form Fields
-        emailLabel: "Ihre E-Mail-Adresse",
-        emailPlaceholder: "ihre@email.com",
-        emailHint: "Wir senden die Zahlungsbestätigung an diese E-Mail",
-        emailValid: "✓ Gültige E-Mail-Adresse",
-        emailInvalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-        providerLabel: "Zahlungsanbieter auswählen",
-        providerPlaceholder: "Zahlungsmethode wählen...",
-        providerHint: "Wählen Sie Ihr bevorzugtes Zahlungsgateway",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "Beginnt mit T, 34 Zeichen",
-        addressFormatErc20: "Beginnt mit 0x, 42 Zeichen",
-        addressFormatBitcoin: "Beginnt mit 1, 3 oder bc1, 26-62 Zeichen",
-        walletHintTron: "Ihre Tron (TRC-20) Wallet-Adresse zum Empfangen von {crypto}",
-        walletHintErc20: "Ihre Ethereum (ERC-20) Wallet-Adresse zum Empfangen von {crypto}",
-        walletHintBitcoin: "Ihre Bitcoin Wallet-Adresse zum Empfangen von {crypto}",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (nur Bitcoin-Netzwerk)",
-        
-        // Buttons
-        payButton: "Zur sicheren Zahlung",
-        newPayment: "Neue Zahlung",
-        
-        // Progress
-        preparingPayment: "Zahlung wird vorbereitet...",
-        processing: "Zahlung wird verarbeitet...",
-        
-        // Payment Result
-        paymentCreated: "Zahlung erstellt",
-        amount: "Betrag",
-        provider: "Anbieter",
-        email: "E-Mail",
-        networkLabel: "Netzwerk",
-        paymentPageOpened: "Zahlungsseite im Browser geöffnet. Vervollständigen Sie die Zahlung dort.",
-        temporaryAddress: "Temporäre Zahlungsadresse",
-        finalWallet: "Mittel werden gesendet an",
-        paymentSuccessful: "Zahlung erfolgreich!",
-        paymentCompleted: "Ihre Zahlung wurde erfolgreich abgeschlossen!",
-        paymentFailed: "Zahlung nicht abgeschlossen",
-        paymentFailedMessage: "Die Zahlung wurde nicht abgeschlossen. Sie können es erneut versuchen oder eine andere Zahlungsmethode wählen.",
-        paymentId: "Zahlungs-ID",
-        status: "Status",
-        
-        // Errors
-        error: "Fehler",
-        fillAllFields: "Bitte füllen Sie alle Felder aus",
-        walletNotConfigured: "Wallet-Adresse nicht konfiguriert. Bitte kontaktieren Sie den Administrator.",
-        networkError: "Netzwerkfehler. Bitte versuchen Sie es erneut.",
-        failedToCreate: "Zahlung konnte nicht erstellt werden",
-        failedToLoadProviders: "Zahlungsanbieter konnten nicht geladen werden",
-        
-        // Toast Messages
-        addressCopied: "Adresse in die Zwischenablage kopiert",
-        copyFailed: "Adresse konnte nicht kopiert werden",
-        
-        // Theme
-        toggleTheme: "Design wechseln",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Ihre Zahlung wird von branchenführender Sicherheit geschützt",
-        
-        // Payment Link
-        paymentLinkReady: "Zahlungslink bereit",
-        clickToOpenPayment: "Klicken Sie auf die Schaltfläche unten, um die Zahlungsseite zu öffnen",
-        openPaymentPage: "Zahlungsseite öffnen",
-        openPaymentLink: "Zahlungslink öffnen",
-        orCopyLink: "Oder kopieren Sie diesen Link:",
-        pleaseOpenLink: "Bitte öffnen Sie den Link manuell",
-        invalidPaymentUrl: "Ungültige Zahlungs-URL",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Zahlungsmethode wählen",
-        selectPaymentOption: "Wählen Sie Ihre bevorzugte Zahlungsoption",
-        cardPayment: "Kartenzahlung",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "IBAN-Überweisung",
-        ibanTransferSubtitle: "Banküberweisung per IBAN",
-        continueButton: "Weiter",
-
-        // IBAN Page
-        ibanPageTitle: "Banküberweisung (IBAN)",
-        ibanPageSubtitle: "Verwenden Sie die folgenden Daten für eine sichere Banküberweisung.",
-        ibanIntegrationTitle: "Integrationsparameter",
-        ibanIntegrationSubtitle: "Tragen Sie diese Werte im Anbieter-Dashboard ein.",
-        ibanIntegrationName: "Integrationsname",
-        ibanIntegrationDomain: "Domain",
-        ibanIntegrationSecretKey: "Geheimer Schlüssel",
-        ibanIntegrationHandler: "Callback-URL",
-        ibanIntegrationSuccess: "URL für erfolgreiche Zahlung",
-        ibanIntegrationFailure: "URL für fehlgeschlagene Zahlung",
-        ibanIntegrationNote: "Bewahren Sie den geheimen Schlüssel sicher auf. Teilen Sie ihn nur mit vertrauenswürdigen Anbietern.",
-        ibanShowSecret: "Schlüssel anzeigen",
-        ibanHideSecret: "Schlüssel verbergen",
-        ibanCopy: "Kopieren",
-        ibanCopied: "Kopiert",
-        ibanLoadingRequisites: "Empfängerdaten werden geladen...",
-        ibanRequisitesMessage: "Bitte wenden Sie sich an den Support, um Zahlungsdaten zu erhalten.",
-        ibanRequisitesModeration: "Zahlungsdaten erscheinen nach Freigabe durch den Anbieter.",
-        ibanRequisitesErrorMessage: "Vorübergehender Fehler. Bitte versuchen Sie es erneut.",
-        ibanRequisitesDetails: "Zahlungsdetails",
-        ibanRequisitesTitle: "Zahlungsdetails",
-        ibanRefreshRequisites: "Aktualisieren",
-        ibanNoRequisites: "Zahlungsdetails sind derzeit nicht verfügbar. Bitte wenden Sie sich an den Support.",
-        ibanRequisitesProcessing: "Zahlungsdetails werden vorbereitet. Bitte in wenigen Sekunden aktualisieren.",
-        ibanAmountHint: "Der Betrag wird in Türkischer Lira (TRY) angegeben.",
-        ibanEmailLabel: "E-Mail des Kunden",
-        ibanGenerateInvoice: "Details erzeugen",
-        ibanAmountInvalid: "Bitte einen gültigen Betrag größer als 0 eingeben.",
-        ibanEmailInvalid: "Bitte eine gültige E-Mail-Adresse eingeben.",
-        ibanRequisitesPayouIframe: "Zahlungsdetails finden Sie im unten eingebetteten Payou-Formular. Falls es nicht lädt, öffnen Sie es in einem neuen Tab.",
-        ibanOpenPaymentForm: "Payou-Formular öffnen",
-        ibanEnterAmount: "Geben Sie Betrag und E-Mail ein, um Zahlungsdetails anzufordern.",
-        ibanInstructionsTitle: "Überweisungsanleitung",
-        ibanInstructionsDescription: "Befolgen Sie diese Schritte, um die Überweisung abzuschließen.",
-        ibanStep1: "Starten Sie eine Überweisung über Ihre Bank oder Zahlungs-App.",
-        ibanStep2: "Verwenden Sie den angegebenen IBAN und den Verwendungszweck für die automatische Zuordnung.",
-        ibanStep3: "Warten Sie nach dem Abschicken auf die Bestätigung per E-Mail.",
-        ibanStatusSuccessTitle: "Überweisung bestätigt",
-        ibanStatusSuccessMessage: "Wir haben die Bestätigung erhalten. Weitere Schritte sind nicht erforderlich.",
-        ibanStatusFailureTitle: "Überweisung ausstehend",
-        ibanStatusFailureMessage: "Wir haben noch keine Bestätigung erhalten. Bitte prüfen Sie die Überweisung bei Ihrer Bank.",
-        ibanBackToMethods: "Zurück zu den Zahlungsmethoden",
-        ibanSupportTitle: "Brauchen Sie Hilfe?",
-        ibanSupportDescription: "Kontaktieren Sie den Support und geben Sie Ihre Zahlungs-ID oder den Verwendungszweck an.",
-        ibanReferenceLabel: "Verwendungszweck / Zahlungs-ID",
-        ibanRequisitesError: "Zahlungsdetails konnten nicht geladen werden.",
-        ibanAmountLabel: "Zu zahlender Betrag",
-        ibanOrderIdLabel: "Bestellnummer",
-        ibanCommentLabel: "Verwendungszweck",
-        ibanOpenPayment: "Zur Zahlung",
-        ibanCopyOrderId: "ID kopieren",
-        ibanStatusLabel: "Zahlungsstatus",
-        ibanCheckStatus: "Status prüfen",
-        ibanStatusUnknown: "Status nicht verfügbar",
-        ibanStatusProcessingMessage: "Zahlung wird noch verarbeitet. Bitte warten Sie auf die Bestätigung.",
-        ibanStatusCancelledMessage: "Die Zahlung wurde abgebrochen oder nicht bestätigt.",
-        ibanInvoiceError: "Zahlungsdetails konnten nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
-        ibanRequisitesRefreshing: "Zahlungsdetails werden aktualisiert...",
-        ibanStatusFetchError: "Status konnte nicht abgerufen werden. Bitte versuchen Sie es später erneut.",
-        ibanNoPaymentUrl: "Die Zahlungsseite ist nicht verfügbar."
-    },
-    es: {
-        // Header
-        title: "Pasarela de Pago Segura",
-        subtitle: "Complete su transacción con confianza y seguridad",
-        
-        // Amount Section
-        totalAmount: "Cantidad Total",
-        amountLabel: "Cantidad a Pagar",
-        secureTransaction: "Transacción segura • Procesamiento instantáneo",
-        
-        // Security Badges
-        sslEncrypted: "Cifrado SSL",
-        securePayment: "Pago Seguro",
-        ssl256bit: "SSL de 256 bits",
-        pciCompliant: "Cumple con PCI",
-        support247: "Soporte 24/7",
-        
-        // Form Sections
-        cryptocurrency: "Criptomoneda",
-        network: "Red",
-        networkHint: "Red para recibir pagos",
-        currency: "Moneda",
-        cryptocurrencyType: "Tipo de criptomoneda",
-        walletAddress: "Dirección de Billetera",
-        showQRCode: "Mostrar Código QR",
-        copyAddress: "Copiar Dirección",
-        walletHint: "Su dirección de billetera para recibir pagos",
-        closeQRCode: "Cerrar Código QR",
-        contactInfo: "Información de Contacto",
-        paymentMethod: "Método de Pago",
-        
-        // Form Fields
-        emailLabel: "Su Dirección de Email",
-        emailPlaceholder: "su@email.com",
-        emailHint: "Enviaremos la confirmación del pago a este email",
-        emailValid: "✓ Dirección de email válida",
-        emailInvalid: "Por favor, ingrese una dirección de email válida",
-        providerLabel: "Seleccionar Proveedor de Pago",
-        providerPlaceholder: "Elegir método de pago...",
-        providerHint: "Seleccione su pasarela de pago preferida",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "Comienza con T, 34 caracteres",
-        addressFormatErc20: "Comienza con 0x, 42 caracteres",
-        addressFormatBitcoin: "Comienza con 1, 3 o bc1, 26-62 caracteres",
-        walletHintTron: "Su dirección de billetera Tron (TRC-20) para recibir {crypto}",
-        walletHintErc20: "Su dirección de billetera Ethereum (ERC-20) para recibir {crypto}",
-        walletHintBitcoin: "Su dirección de billetera Bitcoin para recibir {crypto}",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (Solo Red Bitcoin)",
-        
-        // Buttons
-        payButton: "Proceder al Pago Seguro",
-        newPayment: "Nuevo Pago",
-        
-        // Progress
-        preparingPayment: "Preparando pago...",
-        processing: "Procesando pago...",
-        
-        // Payment Result
-        paymentCreated: "Pago Creado",
-        amount: "Cantidad",
-        provider: "Proveedor",
-        email: "Email",
-        networkLabel: "Red",
-        paymentPageOpened: "Página de pago abierta en el navegador. Complete el pago allí.",
-        temporaryAddress: "Dirección de pago temporal",
-        finalWallet: "Los fondos se enviarán a",
-        paymentSuccessful: "¡Pago completado!",
-        paymentCompleted: "Tu pago se ha completado correctamente.",
-        paymentFailed: "Pago no completado",
-        paymentFailedMessage: "El pago no se completó. Puedes intentarlo de nuevo o elegir otro método de pago.",
-        paymentId: "ID de pago",
-        status: "Estado",
-        
-        // Errors
-        error: "Error",
-        fillAllFields: "Por favor, complete todos los campos",
-        walletNotConfigured: "Dirección de billetera no configurada. Por favor, contacte al administrador.",
-        networkError: "Error de red. Por favor, intente nuevamente.",
-        failedToCreate: "No se pudo crear el pago",
-        failedToLoadProviders: "No se pudieron cargar los proveedores de pago",
-        
-        // Toast Messages
-        addressCopied: "Dirección copiada al portapapeles",
-        copyFailed: "No se pudo copiar la dirección",
-        
-        // Theme
-        toggleTheme: "Cambiar tema",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Su pago está protegido por seguridad líder en la industria",
-        
-        // Payment Link
-        paymentLinkReady: "Enlace de Pago Listo",
-        clickToOpenPayment: "Haga clic en el botón a continuación para abrir la página de pago",
-        openPaymentPage: "Abrir Página de Pago",
-        openPaymentLink: "Abrir Enlace de Pago",
-        orCopyLink: "O copie este enlace:",
-        pleaseOpenLink: "Por favor, abra el enlace manualmente",
-        invalidPaymentUrl: "URL de pago inválida",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Elegir Método de Pago",
-        selectPaymentOption: "Seleccione su opción de pago preferida",
-        cardPayment: "Pago con Tarjeta",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "Transferencia IBAN",
-        ibanTransferSubtitle: "Transferencia bancaria vía IBAN",
-        continueButton: "Continuar",
-
-        // IBAN Page
-        ibanPageTitle: "Transferencia bancaria (IBAN)",
-        ibanPageSubtitle: "Utiliza los datos a continuación para realizar una transferencia bancaria segura.",
-        ibanIntegrationTitle: "Parámetros de integración",
-        ibanIntegrationSubtitle: "Copia estos valores en el panel del proveedor.",
-        ibanIntegrationName: "Nombre de la integración",
-        ibanIntegrationDomain: "Dominio",
-        ibanIntegrationSecretKey: "Clave secreta",
-        ibanIntegrationHandler: "URL del callback",
-        ibanIntegrationSuccess: "URL de pago exitoso",
-        ibanIntegrationFailure: "URL de pago fallido",
-        ibanIntegrationNote: "Mantén la clave secreta en un lugar seguro. Compártela solo con proveedores de confianza.",
-        ibanShowSecret: "Mostrar clave",
-        ibanHideSecret: "Ocultar clave",
-        ibanCopy: "Copiar",
-        ibanCopied: "Copiado",
-        ibanLoadingRequisites: "Cargando datos bancarios...",
-        ibanRequisitesMessage: "Contacta con soporte para obtener los datos de pago.",
-        ibanRequisitesModeration: "Los datos aparecerán tras la aprobación del proveedor.",
-        ibanRequisitesErrorMessage: "Error temporal. Intenta actualizar más tarde.",
-        ibanRequisitesDetails: "Datos de pago",
-        ibanRequisitesTitle: "Datos de pago",
-        ibanRefreshRequisites: "Actualizar",
-        ibanNoRequisites: "Los datos de pago no están disponibles por el momento. Contacta con soporte.",
-        ibanRequisitesProcessing: "Los datos de pago se están generando. Atualiza en unos segundos.",
-        ibanAmountHint: "El importe se indica en liras turcas (TRY).",
-        ibanEmailLabel: "Correo del cliente",
-        ibanGenerateInvoice: "Generar dados",
-        ibanAmountInvalid: "Introduce un importe válido mayor que 0.",
-        ibanEmailInvalid: "Introduce un correo electrónico válido.",
-        ibanRequisitesPayouIframe: "Los datos de pago están disponibles en el formulario de Payou a continuación. Si no se carga, ábrelo en una nueva pestaña.",
-        ibanOpenPaymentForm: "Abrir formulario de Payou",
-        ibanEnterAmount: "Introduce el importe y el correo electrónico para solicitar los datos de pago.",
-        ibanInstructionsTitle: "Instrucciones de transferencia",
-        ibanInstructionsDescription: "Sigue estos pasos para completar la transferencia.",
-        ibanStep1: "Inicia una transferencia desde tu banco o aplicación de pagos.",
-        ibanStep2: "Utiliza el IBAN y la referencia proporcionados para asegurar la conciliación automática.",
-        ibanStep3: "Después de enviar los fondos, aguarde la confirmación por e-mail.",
-        ibanStatusSuccessTitle: "Transferencia confirmada",
-        ibanStatusSuccessMessage: "Hemos recibido la confirmación. No se requieren más acciones.",
-        ibanStatusFailureTitle: "Transferencia pendiente",
-        ibanStatusFailureMessage: "Aún no hemos recibido la confirmación. Verifica la transferencia con tu banco.",
-        ibanBackToMethods: "Volver a los métodos de pago",
-        ibanSupportTitle: "¿Necesitas ayuda?",
-        ibanSupportDescription: "Contacta al soporte y proporciona tu ID de pago o referencia de transferencia.",
-        ibanReferenceLabel: "Referencia / ID de pago",
-        ibanRequisitesError: "No se pudieron cargar los datos de pago.",
-        ibanAmountLabel: "Importe a pagar",
-        ibanOrderIdLabel: "ID del pedido",
-        ibanCommentLabel: "Concepto de pago",
-        ibanOpenPayment: "Ir para el pago",
-        ibanCopyOrderId: "Copiar ID",
-        ibanStatusLabel: "Estado del pago",
-        ibanCheckStatus: "Comprobar estado",
-        ibanStatusUnknown: "Estado no disponible",
-        ibanStatusProcessingMessage: "El pago aún está en proceso. Espera la confirmación.",
-        ibanStatusCancelledMessage: "El pago fue cancelado o no se confirmó.",
-        ibanInvoiceError: "No se pudieron obtener los datos de pago. Inténtalo más tarde.",
-        ibanRequisitesRefreshing: "Actualizando datos de pago...",
-        ibanStatusFetchError: "No se pudo obtener el estado. Inténtalo más tarde.",
-        ibanNoPaymentUrl: "El enlace de pago no está disponible."
-    },
-    pt: {
-        // Header
-        title: "Gateway de Pagamento Seguro",
-        subtitle: "Complete sua transação com confiança e segurança",
-        
-        // Amount Section
-        totalAmount: "Valor Total",
-        amountLabel: "Valor a Pagar",
-        secureTransaction: "Transação segura • Processamento instantâneo",
-        
-        // Security Badges
-        sslEncrypted: "Criptografado SSL",
-        securePayment: "Pagamento Seguro",
-        ssl256bit: "SSL de 256 bits",
-        pciCompliant: "Compatível com PCI",
-        support247: "Suporte 24/7",
-        
-        // Form Sections
-        cryptocurrency: "Criptomoeda",
-        network: "Rede",
-        networkHint: "Rede para receber pagamentos",
-        currency: "Moeda",
-        cryptocurrencyType: "Tipo de criptomoeda",
-        walletAddress: "Endereço da Carteira",
-        showQRCode: "Mostrar Código QR",
-        copyAddress: "Copiar Endereço",
-        walletHint: "Seu endereço de carteira para receber pagamentos",
-        closeQRCode: "Fechar Código QR",
-        contactInfo: "Informações de Contato",
-        paymentMethod: "Método de Pagamento",
-        
-        // Form Fields
-        emailLabel: "Seu Endereço de Email",
-        emailPlaceholder: "seu@email.com",
-        emailHint: "Enviaremos a confirmação do pagamento para este email",
-        emailValid: "✓ Endereço de email válido",
-        emailInvalid: "Por favor, insira um endereço de email válido",
-        providerLabel: "Selecionar Provedor de Pagamento",
-        providerPlaceholder: "Escolher método de pagamento...",
-        providerHint: "Selecione seu gateway de pagamento preferido",
-        
-        // Network Options
-        networkTrc20: "TRC-20 (Tron)",
-        networkErc20: "ERC-20 (Ethereum)",
-        networkBitcoin: "Bitcoin",
-        networkTron: "Tron (TRC-20)",
-        networkEthereum: "Ethereum (ERC-20)",
-        addressFormatTrc20: "Começa com T, 34 caracteres",
-        addressFormatErc20: "Começa com 0x, 42 caracteres",
-        addressFormatBitcoin: "Começa com 1, 3 ou bc1, 26-62 caracteres",
-        walletHintTron: "Seu endereço de carteira Tron (TRC-20) para receber {crypto}",
-        walletHintErc20: "Seu endereço de carteira Ethereum (ERC-20) para receber {crypto}",
-        walletHintBitcoin: "Seu endereço de carteira Bitcoin para receber {crypto}",
-        
-        // Cryptocurrency Options
-        cryptoUsdt: "USDT",
-        cryptoBtc: "BTC",
-        cryptoBtcDisabled: "BTC (Apenas Rede Bitcoin)",
-        
-        // Buttons
-        payButton: "Prosseguir para Pagamento Seguro",
-        newPayment: "Novo Pagamento",
-        
-        // Progress
-        preparingPayment: "Preparando pagamento...",
-        processing: "Processando pagamento...",
-        
-        // Payment Result
-        paymentCreated: "Pagamento Criado",
-        amount: "Valor",
-        provider: "Provedor",
-        email: "Email",
-        networkLabel: "Rede",
-        paymentPageOpened: "Página de pagamento aberta no navegador. Complete o pagamento lá.",
-        temporaryAddress: "Endereço de pagamento temporário",
-        finalWallet: "Os fundos serão enviados para",
-        paymentSuccessful: "Pagamento concluído!",
-        paymentCompleted: "Seu pagamento foi concluído com sucesso!",
-        paymentFailed: "Pagamento não concluído",
-        paymentFailedMessage: "O pagamento não foi concluído. Você pode tentar novamente ou escolher outra forma de pagamento.",
-        paymentId: "ID do pagamento",
-        status: "Status",
-        
-        // Errors
-        error: "Erro",
-        fillAllFields: "Por favor, preencha todos os campos",
-        walletNotConfigured: "Endereço da carteira não configurado. Por favor, entre em contato com o administrador.",
-        networkError: "Erro de rede. Por favor, tente novamente.",
-        failedToCreate: "Falha ao criar pagamento",
-        failedToLoadProviders: "Falha ao carregar provedores de pagamento",
-        
-        // Toast Messages
-        addressCopied: "Endereço copiado para a área de transferência",
-        copyFailed: "Falha ao copiar endereço",
-        
-        // Theme
-        toggleTheme: "Alternar tema",
-        
-        // Payment Guarantee
-        paymentGuarantee: "Seu pagamento está protegido por segurança líder da indústria",
-        
-        // Payment Link
-        paymentLinkReady: "Link de Pagamento Pronto",
-        clickToOpenPayment: "Clique no botão abaixo para abrir a página de pagamento",
-        openPaymentPage: "Abrir Página de Pagamento",
-        openPaymentLink: "Abrir Link de Pagamento",
-        orCopyLink: "Ou copie este link:",
-        pleaseOpenLink: "Por favor, abra o link manualmente",
-        invalidPaymentUrl: "URL de pagamento inválida",
-        
-        // Payment Method Selection Page
-        choosePaymentMethod: "Escolher Método de Pagamento",
-        selectPaymentOption: "Selecione sua opção de pagamento preferida",
-        cardPayment: "Pagamento com Cartão",
-        cardPaymentSubtitle: "VISA / Mastercard / Apple Pay / Google Pay",
-        ibanTransfer: "Transferência IBAN",
-        ibanTransferSubtitle: "Transferência bancária via IBAN",
-        continueButton: "Continuar",
-
-        // IBAN Page
-        ibanPageTitle: "Transferência bancária (IBAN)",
-        ibanPageSubtitle: "Use os dados abaixo para concluir uma transferência bancária segura.",
-        ibanIntegrationTitle: "Parâmetros de integração",
-        ibanIntegrationSubtitle: "Copie esses valores no painel do provedor.",
-        ibanIntegrationName: "Nome da integração",
-        ibanIntegrationDomain: "Domínio",
-        ibanIntegrationSecretKey: "Chave secreta",
-        ibanIntegrationHandler: "URL do callback",
-        ibanIntegrationSuccess: "URL de pagamento bem-sucedido",
-        ibanIntegrationFailure: "URL de pagamento malsucedido",
-        ibanIntegrationNote: "Mantenha a chave secreta em segurança. Compartilhe apenas com provedores confiáveis.",
-        ibanShowSecret: "Mostrar chave",
-        ibanHideSecret: "Ocultar chave",
-        ibanCopy: "Copiar",
-        ibanCopied: "Copiado",
-        ibanLoadingRequisites: "Carregando dados bancários...",
-        ibanRequisitesMessage: "Entre em contato com o suporte para obter os dados de pagamento.",
-        ibanRequisitesModeration: "Os dados aparecerão após a aprovação do provedor.",
-        ibanRequisitesErrorMessage: "Erro temporário. Tente atualizar mais tarde.",
-        ibanRequisitesDetails: "Dados de pagamento",
-        ibanRequisitesTitle: "Dados de pagamento",
-        ibanRefreshRequisites: "Atualizar",
-        ibanNoRequisites: "Os dados de pagamento não estão disponíveis no momento. Fale com o suporte.",
-        ibanRequisitesProcessing: "Os dados de pagamento estão sendo gerados. Atualize em alguns segundos.",
-        ibanAmountHint: "O valor deve ser informado em liras turcas (TRY).",
-        ibanEmailLabel: "Email do cliente",
-        ibanGenerateInvoice: "Gerar dados",
-        ibanAmountInvalid: "Informe um valor válido maior que 0.",
-        ibanEmailInvalid: "Informe um email válido.",
-        ibanRequisitesPayouIframe: "Os dados de pagamento podem ser vistos no formulário Payou abaixo. Se não carregar, abra em uma nova aba.",
-        ibanOpenPaymentForm: "Abrir formulário Payou",
-        ibanEnterAmount: "Informe o valor e o email para solicitar os dados de pagamento.",
-        ibanInstructionsTitle: "Instruções da transferência",
-        ibanInstructionsDescription: "Siga estas etapas para concluir a transferência.",
-        ibanStep1: "Inicie uma transferência no seu banco ou aplicativo de pagamentos.",
-        ibanStep2: "Use o IBAN e a referência fornecidos para garantir a conciliação automática.",
-        ibanStep3: "Após enviar os fundos, aguarde a confirmação por e-mail.",
-        ibanStatusSuccessTitle: "Transferência confirmada",
-        ibanStatusSuccessMessage: "Recebemos a confirmação. Nenhuma outra ação é necessária.",
-        ibanStatusFailureTitle: "Transferência pendente",
-        ibanStatusFailureMessage: "Ainda não recebemos a confirmação. Verifique a transferência com seu banco.",
-        ibanBackToMethods: "Voltar aos métodos de pagamento",
-        ibanSupportTitle: "Precisa de ajuda?",
-        ibanSupportDescription: "Entre em contato com o suporte e informe o ID do pagamento ou a referência da transferência.",
-        ibanReferenceLabel: "Referência / ID do pagamento",
-        ibanRequisitesError: "Não foi possível carregar os dados de pagamento.",
-        ibanAmountLabel: "Valor a pagar",
-        ibanOrderIdLabel: "ID do pedido",
-        ibanCommentLabel: "Descrição do pagamento",
-        ibanOpenPayment: "Ir para o pagamento",
-        ibanCopyOrderId: "Copiar ID",
-        ibanStatusLabel: "Status do pagamento",
-        ibanCheckStatus: "Verificar status",
-        ibanStatusUnknown: "Status indisponível",
-        ibanStatusProcessingMessage: "O pagamento ainda está em processamento. Aguarde a confirmação.",
-        ibanStatusCancelledMessage: "O pagamento foi cancelado ou não foi confirmado.",
-        ibanInvoiceError: "Não foi possível obter os dados de pagamento. Tente novamente mais tarde.",
-        ibanRequisitesRefreshing: "Atualizando dados de pagamento...",
-        ibanStatusFetchError: "Não foi possível obter o status. Tente novamente mais tarde.",
-        ibanNoPaymentUrl: "O link da página de pagamento não está disponível."
+        ibanCommentLabel: "Açıklama",
+        ibanOpenPayment: "Ödemeye devam et",
+        ibanCopyOrderId: "ID'yi kopyala",
+        ibanStatusLabel: "Ödeme durumu",
+        ibanCheckStatus: "Durumu kontrol et",
+        ibanStatusUnknown: "Durum mevcut değil",
+        ibanStatusProcessingMessage: "Ödeme işleniyor. Lütfen onay için bekleyin.",
+        ibanStatusCancelledMessage: "Ödeme iptal edildi veya onaylanmadı.",
+        ibanStatusSuccessTitle: "Havale onaylandı",
+        ibanStatusSuccessMessage: "Onay aldık. Ek işlem gerekmiyor.",
+        ibanStatusFailureTitle: "Havale beklemede",
+        ibanStatusFailureMessage: "Henüz onay alınmadı. Lütfen bankanızla kontrol edin.",
+        ibanStatusFetchError: "Durum alınamadı. Lütfen daha sonra tekrar deneyin.",
+        ibanInvoiceError: "Ödeme bilgileri alınamadı. Lütfen daha sonra tekrar deneyin.",
+        ibanNoPaymentUrl: "Ödeme bağlantısı mevcut değil.",
+        ibanBackToMethods: "Ödeme yöntemlerine dön",
+        ibanSupportTitle: "Yardıma mı ihtiyacınız var?",
+        ibanSupportDescription: "Destek ekibine ödeme kimliğinizi iletin.",
+        ibanReferenceLabel: "Referans / Ödeme kimliği"
     }
 };
 
-// Функция для получения текущего языка
 function getCurrentLanguage() {
     return 'tr';
 }
 
-// Функция для установки языка
 function setLanguage(lang) {
     updateTranslations();
-    
-    // Обновить подсказки и опции после смены языка
+
     if (typeof updateHints === 'function') {
         updateHints();
     }
@@ -1109,94 +141,90 @@ function setLanguage(lang) {
     }
 }
 
-// Экспортируем функцию для использования в onchange атрибутах
 window.setLanguage = setLanguage;
 
-// Функция для обновления переводов на странице
 function updateTranslations() {
-    const lang = 'tr';
-    const t = translations[lang];
-    
-    // Обновляем все тексты на странице
-    const elements = {
-        // Header
-        'title': document.querySelector('.payment-header-section h1'),
-        'subtitle': document.querySelector('.payment-header-section .subtitle'),
-        
-        // Amount Section
-        'totalAmount': document.querySelector('.amount-label'),
-        'secureTransaction': document.querySelector('.amount-hint'),
-        
-        // Security Badges
-        'sslEncrypted': document.querySelector('.trust-badge:first-child span'),
-        'securePayment': document.querySelector('.trust-badge:nth-child(2) span'),
-        'ssl256bit': document.querySelector('.security-feature:nth-child(3) span'),
-        'pciCompliant': document.querySelector('.security-feature:nth-child(4) span'),
-        'support247': document.querySelector('.security-feature:nth-child(5) span'),
-        
-        // Form Sections (только существующие элементы)
-        'walletAddress': document.querySelector('.form-section .form-section-title span'),
-        'copyAddress': document.querySelector('#copyAddressBtn'),
-        'walletHint': document.querySelector('#walletHint'),
-        'contactInfo': document.querySelector('.form-section:nth-of-type(2) .form-section-title span'),
-        
-        // Form Fields
-        'emailLabel': document.querySelector('label[for="email"]'),
-        'emailPlaceholder': document.getElementById('email'),
-        'emailHint': document.querySelector('#emailHint') || (document.querySelector('#email')?.parentElement?.querySelector('small')),
-        
-        // Buttons
-        'payButton': document.querySelector('#payButton span'),
-        'newPayment': document.querySelector('#paymentResult .btn-secondary'),
-        
-        // Progress
-        'preparingPayment': document.querySelector('#progressText'),
-        'processing': document.querySelector('#loadingText'),
-        
-        // Payment Guarantee
-        'paymentGuarantee': document.querySelector('.payment-guarantee span'),
-        
-        // Theme Toggle
-        'toggleTheme': document.querySelector('#themeToggle')
+    const dict = translations.tr;
+    if (!dict) return;
+
+    const setTextById = (id, key) => {
+        const el = document.getElementById(id);
+        if (el && dict[key]) {
+            el.textContent = dict[key];
+        }
     };
-    
-    // Обновляем элементы
-    if (elements.title) elements.title.textContent = t.title;
-    if (elements.subtitle) elements.subtitle.textContent = t.subtitle;
-    if (elements.totalAmount) elements.totalAmount.textContent = t.totalAmount;
-    if (elements.secureTransaction) elements.secureTransaction.textContent = t.secureTransaction;
-    if (elements.sslEncrypted) elements.sslEncrypted.textContent = t.sslEncrypted;
-    if (elements.securePayment) elements.securePayment.textContent = t.securePayment;
-    if (elements.ssl256bit) elements.ssl256bit.textContent = t.ssl256bit;
-    if (elements.pciCompliant) elements.pciCompliant.textContent = t.pciCompliant;
-    if (elements.support247) elements.support247.textContent = t.support247;
-    if (elements.walletAddress) elements.walletAddress.textContent = t.walletAddress;
-    if (elements.copyAddress) elements.copyAddress.setAttribute('title', t.copyAddress);
-    if (elements.contactInfo) elements.contactInfo.textContent = t.contactInfo;
-    if (elements.emailLabel) elements.emailLabel.textContent = t.emailLabel;
-    if (elements.emailPlaceholder) elements.emailPlaceholder.placeholder = t.emailPlaceholder;
-    if (elements.emailHint) elements.emailHint.textContent = t.emailHint;
-    if (elements.payButton) elements.payButton.textContent = t.payButton;
-    if (elements.newPayment) elements.newPayment.textContent = t.newPayment;
-    if (elements.preparingPayment) elements.preparingPayment.textContent = t.preparingPayment;
-    if (elements.processing) elements.processing.textContent = t.processing;
-    if (elements.paymentGuarantee) elements.paymentGuarantee.textContent = t.paymentGuarantee;
-    if (elements.toggleTheme) elements.toggleTheme.setAttribute('title', t.toggleTheme);
-    
-    // Обновляем опции сетей и криптовалют - удалено, так как теперь только Bitcoin
+
+    const setText = (selector, key) => {
+        const el = document.querySelector(selector);
+        if (el && dict[key]) {
+            el.textContent = dict[key];
+        }
+    };
+
+    const setAttr = (selector, attr, key) => {
+        const el = document.querySelector(selector);
+        if (el && dict[key]) {
+            el[attr] = dict[key];
+        }
+    };
+
+    // Index page elements
+    setTextById('pageTitle', 'choosePaymentMethod');
+    setTextById('pageSubtitle', 'selectPaymentOption');
+    setTextById('cardPaymentTitle', 'cardPayment');
+    setTextById('cardPaymentSubtitle', 'cardPaymentSubtitle');
+    setTextById('cardPaymentButtonText', 'continueButton');
+    setTextById('ibanPaymentTitle', 'ibanTransfer');
+    setTextById('ibanPaymentSubtitle', 'ibanTransferSubtitle');
+    setTextById('ibanPaymentButtonText', 'continueButton');
+    setTextById('securePaymentBadge', 'securePayment');
+    setTextById('sslEncryptedBadge', 'sslEncrypted');
+
+    // Payment page elements
+    setText('.payment-header-section h1', 'title');
+    setText('.payment-header-section .subtitle', 'subtitle');
+    setText('.amount-label', 'totalAmount');
+    setText('.amount-hint', 'secureTransaction');
+    setText('.payment-guarantee span', 'paymentGuarantee');
+    setText('#progressText', 'preparingPayment');
+    setText('#loadingText', 'processing');
+    setText('#payButton span', 'payButton');
+    setText('#paymentResult .btn-secondary', 'newPayment');
+    setText('#walletHint', 'walletHint');
+    setText('.form-section .form-section-title span', 'walletAddress');
+    setText('.form-section:nth-of-type(2) .form-section-title span', 'contactInfo');
+    setText('.trust-badge:first-child span', 'sslEncrypted');
+    setText('.trust-badge:nth-child(2) span', 'securePayment');
+
+    setAttr('label[for="email"]', 'textContent', 'emailLabel');
+    const emailInput = document.getElementById('email');
+    if (emailInput && dict.emailPlaceholder) {
+        emailInput.placeholder = dict.emailPlaceholder;
+    }
+    const emailHint = document.getElementById('emailHint');
+    if (emailHint && dict.emailHint) {
+        emailHint.textContent = dict.emailHint;
+    }
+    const copyBtn = document.getElementById('copyAddressBtn');
+    if (copyBtn && dict.copyAddress) {
+        copyBtn.setAttribute('title', dict.copyAddress);
+    }
+
+    // IBAN page elements
+    setTextById('ibanPageTitle', 'ibanPageTitle');
+    setTextById('ibanPageSubtitle', 'ibanPageSubtitle');
+    setTextById('ibanWidgetMessage', 'ibanLoadingRequisites');
 }
 
-// Функция для получения перевода
 function t(key) {
     const translation = translations.tr;
-    return translation[key] || key;
+    return translation?.[key] || key;
 }
 
-// Функция для получения перевода с подстановкой
 function tFormat(key, params) {
     let text = t(key);
     if (params) {
-        Object.keys(params).forEach(param => {
+        Object.keys(params).forEach((param) => {
             text = text.replace(`{${param}}`, params[param]);
         });
     }

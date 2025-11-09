@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>IBAN Transfer</title>
+    <title>IBAN Havalesi</title>
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=6.4">
@@ -351,7 +351,7 @@
         }
     </style>
 </head>
-<body>
+<body class="dark-theme-active">
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="icon-iban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="5" x2="7" y2="19"/><path d="M10 14l2-2 2 2 2-2"/></symbol>
         <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
@@ -361,26 +361,20 @@
     </svg>
 
     <div class="container" id="ibanContainer">
-        <div class="top-controls">
-            <button class="theme-toggle" id="themeToggle" title="Toggle theme" type="button">
-                <svg class="theme-icon" id="themeIcon"><use href="#icon-theme"></use></svg>
-            </button>
-        </div>
-
         <header class="payment-header-section" style="margin-top: 24px;">
             <div class="header-icon-wrapper">
                 <svg class="header-icon"><use href="#icon-iban"></use></svg>
                 <div class="header-glow"></div>
             </div>
-            <h1 id="ibanPageTitle">IBAN Transfer</h1>
-            <p class="subtitle" id="ibanPageSubtitle">Use the details below to complete a secure bank transfer.</p>
+            <h1 id="ibanPageTitle">IBAN Havalesi</h1>
+            <p class="subtitle" id="ibanPageSubtitle">Güvenli havale için aşağıdaki bilgileri kullanın.</p>
         </header>
 
         <section class="widget-card" id="ibanWidgetShell">
             <div id="ibanWidgetRoot">
                 <div class="widget-placeholder">
                     <div class="spinner" role="status" aria-label="Loading"></div>
-                    <p class="placeholder-text" id="ibanWidgetMessage">Загрузка реквизитов…</p>
+                    <p class="placeholder-text" id="ibanWidgetMessage">Ödeme bilgileri yükleniyor...</p>
                 </div>
             </div>
         </section>

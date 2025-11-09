@@ -22,21 +22,21 @@ const REQUISITE_LABELS = {
     iban: 'IBAN',
     bic: 'BIC / SWIFT',
     swift: 'SWIFT',
-    bank: 'Банк',
-    bank_name: 'Банк',
-    wallet_owner: 'Получатель',
-    holder: 'Получатель',
-    name: 'Получатель',
-    card: 'Номер карты',
-    account: 'Счёт',
-    account_number: 'Счёт',
-    reference: 'Назначение платежа',
-    comment: 'Назначение платежа',
-    purpose: 'Назначение платежа',
-    sbp_bank: 'Банк (СБП)',
-    amount: 'Сумма',
-    tg_country: 'Банк',
-    currency: 'Валюта'
+    bank: 'Banka',
+    bank_name: 'Banka',
+    wallet_owner: 'Alıcı',
+    holder: 'Alıcı',
+    name: 'Alıcı',
+    card: 'Kart numarası',
+    account: 'Hesap',
+    account_number: 'Hesap',
+    reference: 'Açıklama',
+    comment: 'Açıklama',
+    purpose: 'Açıklama',
+    sbp_bank: 'Banka (SBP)',
+    amount: 'Tutar',
+    tg_country: 'Banka',
+    currency: 'Para birimi'
 };
 
 function translateKey(key, fallback) {
@@ -125,53 +125,11 @@ function initTelegramWebApp() {
     }
 }
 
-function applyTheme(theme) {
+function enforceDarkTheme() {
     const html = document.documentElement;
     const body = document.body;
-    const icon = document.getElementById('themeIcon');
-
-    if (theme === 'dark') {
-        html.setAttribute('data-theme', 'dark');
-        body.classList.add('dark-theme-active');
-        if (icon) icon.innerHTML = '<use href="#icon-moon"></use>';
-    } else {
-        html.setAttribute('data-theme', 'light');
-        body.classList.remove('dark-theme-active');
-        if (icon) icon.innerHTML = '<use href="#icon-theme"></use>';
-    }
-}
-
-function setupThemeToggle() {
-    const toggle = document.getElementById('themeToggle');
-
-    if (!toggle) return;
-
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-    applyTheme(theme);
-
-    toggle.addEventListener('click', (event) => {
-        event.preventDefault();
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        localStorage.setItem('theme', next);
-
-        if (tg && tg.HapticFeedback) {
-            try {
-                tg.HapticFeedback.impactOccurred('light');
-            } catch (err) {
-                console.warn('Haptic feedback failed:', err);
-            }
-        }
-    });
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-        if (!localStorage.getItem('theme')) {
-            applyTheme(event.matches ? 'dark' : 'light');
-        }
-    });
+    html.setAttribute('data-theme', 'dark');
+    body.classList.add('dark-theme-active');
 }
 
 function updateIbanTranslations() {
@@ -182,27 +140,22 @@ function updateIbanTranslations() {
     const placeholderMessage = document.getElementById('ibanWidgetMessage');
 
     const localeMap = {
-        ru: 'ru-RU',
-        tr: 'tr-TR',
-        de: 'de-DE',
-        es: 'es-ES',
-        pt: 'pt-PT',
-        en: 'en-US'
+        tr: 'tr-TR'
     };
 
     const currentLang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : state.params.lang;
     if (currentLang) {
         state.params.lang = currentLang;
         state.params.locale = localeMap[currentLang] || state.params.locale;
-        if (!state.params.currency || state.params.currency === 'RUB') {
-            state.params.currency = currentLang === 'ru' ? 'RUB' : 'TRY';
+        if (!state.params.currency) {
+            state.params.currency = 'TRY';
         }
     }
 
     if (titleEl) titleEl.textContent = t('ibanPageTitle');
     if (subtitleEl) subtitleEl.textContent = t('ibanPageSubtitle');
     if (placeholderMessage && !state.invoice) {
-        placeholderMessage.textContent = translateKey('ibanLoadingRequisites', 'Загрузка реквизитов...');
+        placeholderMessage.textContent = translateKey('ibanLoadingRequisites', 'Ödeme bilgileri yükleniyor...');
     }
 
     if (state.invoice) {
@@ -226,27 +179,15 @@ function parseQueryParams() {
     const amountParam = params.get('amount') || params.get('summ') || params.get('sum') || '2400';
     const amount = formatAmountValue(amountParam);
 
-    const rawLang = params.get('lang') || params.get('language');
-    const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-    let normalizedLang = null;
-    if (rawLang) {
-        const candidate = rawLang.toLowerCase();
-        normalizedLang = langMap[candidate] || candidate;
-    }
-    const lang = normalizedLang || 'tr';
+    const lang = 'tr';
     const localeMap = {
-        ru: 'ru-RU',
-        tr: 'tr-TR',
-        de: 'de-DE',
-        es: 'es-ES',
-        pt: 'pt-PT',
-        en: 'en-US'
+        tr: 'tr-TR'
     };
 
     const rawCurrency =
         params.get('currency') ||
         params.get('cur') ||
-        (lang === 'ru' ? 'RUB' : 'TRY');
+        'TRY';
 
     return {
         amount,
@@ -298,7 +239,7 @@ function normalizeRequisites(data) {
     if (data.status === 'error') {
         return [{
             type: 'error',
-            message: data.message || translateKey('ibanRequisitesError', 'Не удалось получить реквизиты')
+            message: data.message || translateKey('ibanRequisitesError', 'Ödeme bilgileri alınamadı')
         }];
     }
 
@@ -307,7 +248,7 @@ const buildMultiline = (lines) => {
         if (!filtered.length) return [];
         return [{
             type: 'multiline',
-            label: translateKey('ibanRequisitesDetails', 'Реквизиты'),
+            label: translateKey('ibanRequisitesDetails', 'Ödeme bilgileri'),
             value: filtered.join('\n')
         }];
     };
@@ -371,16 +312,16 @@ function buildControls() {
     return `
         <div class="iban-controls">
             <div class="iban-control-field">
-                <label class="iban-control-label" for="ibanAmountInput">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</label>
+                <label class="iban-control-label" for="ibanAmountInput">${translateKey('ibanAmountLabel', 'Ödenecek tutar')}</label>
                 <input type="number" inputmode="decimal" step="0.01" min="0" id="ibanAmountInput" class="iban-control-input" value="${amountValue}">
-                <div class="iban-control-hint">${translateKey('ibanAmountHint', 'Сумма указывается в турецких лирах (TRY)')}</div>
+                <div class="iban-control-hint">${translateKey('ibanAmountHint', 'Tutar TRY cinsinden girilmelidir')}</div>
             </div>
             <div class="iban-control-field">
-                <label class="iban-control-label" for="ibanEmailInput">${translateKey('ibanEmailLabel', 'Email клиента')}</label>
+                <label class="iban-control-label" for="ibanEmailInput">${translateKey('ibanEmailLabel', 'Müşteri e-postası')}</label>
                 <input type="email" id="ibanEmailInput" class="iban-control-input" value="${escapeAttr(emailValue)}">
             </div>
             <div class="iban-control-actions">
-                <button class="btn btn-primary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
+                <button class="btn btn-primary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Bilgileri al')}</button>
             </div>
         </div>
     `;
@@ -413,12 +354,12 @@ function attachEventHandlers() {
 
             const formattedAmount = formatAmountValue(amountValueRaw);
             if (!formattedAmount || Number(formattedAmount) <= 0) {
-                alert(translateKey('ibanAmountInvalid', 'Введите корректную сумму больше 0.'));
+                alert(translateKey('ibanAmountInvalid', 'Lütfen 0\'dan büyük geçerli bir tutar girin.'));
                 return;
             }
 
             if (emailValue && !isValidEmail(emailValue)) {
-                alert(translateKey('ibanEmailInvalid', 'Введите корректный email.'));
+                alert(translateKey('ibanEmailInvalid', 'Lütfen geçerli bir e-posta adresi girin.'));
                 return;
             }
 
@@ -439,7 +380,7 @@ function normalizeStatusData(statusData) {
     if (!statusData) {
         return {
             status: 'unknown',
-            message: translateKey('ibanStatusUnknown', 'Статус не определён')
+            message: translateKey('ibanStatusUnknown', 'Durum mevcut değil')
         };
     }
 
@@ -454,11 +395,11 @@ function normalizeStatusData(statusData) {
     let message = statusData.message || translateKey(`ibanStatus_${status}`, status);
 
     if (status === 'success') {
-        message = translateKey('ibanStatusSuccessMessage', 'Оплата успешно подтверждена');
+        message = translateKey('ibanStatusSuccessMessage', 'Havale başarıyla onaylandı');
     } else if (status === 'processing') {
-        message = translateKey('ibanStatusProcessingMessage', 'Платёж в обработке, ожидайте подтверждения');
+        message = translateKey('ibanStatusProcessingMessage', 'Ödeme işleniyor, lütfen onay için bekleyin');
     } else if (status === 'cancelled') {
-        message = translateKey('ibanStatusCancelledMessage', 'Платёж отменён или не прошёл проверку');
+        message = translateKey('ibanStatusCancelledMessage', 'Ödeme iptal edildi veya onaylanmadı');
     }
 
     return {
@@ -512,7 +453,7 @@ async function createInvoice(initial = false) {
 
         const data = await response.json();
         if (!data.success) {
-            throw new Error(data.error || 'Failed to create invoice');
+            throw new Error(data.error || translateKey('ibanInvoiceError', 'Ödeme bilgileri alınamadı. Lütfen daha sonra tekrar deneyin.'));
         }
 
         state.invoice = data.invoice;
@@ -522,10 +463,10 @@ async function createInvoice(initial = false) {
             return;
         }
 
-        throw new Error('Payou form URL is not available.');
+        throw new Error(translateKey('ibanNoPaymentUrl', 'Ödeme bağlantısı mevcut değil.'));
     } catch (error) {
         console.error('Invoice creation failed', error);
-        alert(error?.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'));
+        alert(error?.message || translateKey('ibanInvoiceError', 'Ödeme bilgileri alınamadı. Lütfen daha sonra tekrar deneyin.'));
     }
 }
 
@@ -564,7 +505,7 @@ async function pollStatus(force = false) {
     } catch (error) {
         console.error('Status check failed', error);
         if (force) {
-            alert(translateKey('ibanStatusFetchError', 'Не удалось получить статус. Попробуйте позже.'));
+            alert(translateKey('ibanStatusFetchError', 'Durum alınamadı. Lütfen daha sonra tekrar deneyin.'));
         }
     }
 }
@@ -599,7 +540,7 @@ function bootstrapInvoiceFlow() {
 
 function initIbanPage() {
     initTelegramWebApp();
-    setupThemeToggle();
+    enforceDarkTheme();
     setupLanguageSelector();
     updateIbanTranslations();
     if (!state.params.currency) {

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="tr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Payment - Ready to Pay</title>
+    <title>Ödeme - Hazırsınız</title>
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=6.4">
@@ -27,7 +27,7 @@
         }
     </style>
 </head>
-<body>
+<body class="dark-theme-active">
     <!-- SVG Icons Sprite -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
@@ -60,31 +60,14 @@
         <div id="paymentTab" class="tab-content active">
             <!-- Unified Payment Container -->
             <div class="payment-container" id="paymentContainer">
-                <!-- Language Selector & Theme Toggle -->
-                <div class="top-controls">
-                    <div class="language-selector-wrapper">
-                        <select id="languageSelector" class="language-selector">
-                            <option value="en">EN</option>
-                            <option value="ru">RU</option>
-                            <option value="tr">TR</option>
-                            <option value="de">DE</option>
-                            <option value="es">ES</option>
-                            <option value="pt">PT</option>
-                        </select>
-                    </div>
-                    <button class="theme-toggle" id="themeToggle" title="Toggle theme" type="button">
-                        <svg class="theme-icon" id="themeIcon"><use href="#icon-theme"></use></svg>
-                    </button>
-                </div>
-
                 <!-- Header Section -->
                 <div class="payment-header-section">
                     <div class="header-icon-wrapper">
                         <svg class="header-icon"><use href="#icon-card"></use></svg>
                         <div class="header-glow"></div>
                     </div>
-                    <h1>Secure Payment Gateway</h1>
-                    <p class="subtitle">Complete your transaction with confidence and security</p>
+                    <h1>Güvenli Ödeme Ağı</h1>
+                    <p class="subtitle">İşleminizi güvenle ve hızla tamamlayın</p>
                 </div>
 
                 <!-- Amount Summary Section -->
@@ -94,19 +77,19 @@
                             <svg class="amount-icon"><use href="#icon-money"></use></svg>
                         </div>
                         <div class="amount-content">
-                            <span class="amount-label">Total Amount</span>
+                            <span class="amount-label">Toplam tutar</span>
                             <span class="amount-value" id="displayAmount">50.00 USD</span>
-                            <span class="amount-hint">Secure transaction • Instant processing</span>
+                            <span class="amount-hint">Güvenli işlem • Anında onay</span>
                         </div>
                     </div>
                     <div class="security-features">
                         <div class="trust-badge">
                             <svg class="trust-icon"><use href="#icon-shield"></use></svg>
-                            <span>SSL Encrypted</span>
+                            <span>SSL ile şifrelenmiş</span>
                         </div>
                         <div class="trust-badge">
                             <svg class="trust-icon"><use href="#icon-lock"></use></svg>
-                            <span>Secure Payment</span>
+                            <span>Güvenli ödeme</span>
                         </div>
                         <div class="security-feature">
                             <svg class="security-icon"><use href="#icon-shield"></use></svg>
@@ -114,11 +97,11 @@
                         </div>
                         <div class="security-feature">
                             <svg class="security-icon"><use href="#icon-lock"></use></svg>
-                            <span>PCI Compliant</span>
+                            <span>PCI uyumlu</span>
                         </div>
                         <div class="security-feature">
                             <svg class="security-icon"><use href="#icon-shield"></use></svg>
-                            <span>24/7 Support</span>
+                            <span>7/24 destek</span>
                         </div>
                     </div>
                 </div>
@@ -129,16 +112,16 @@
                 <div class="form-section">
                     <div class="form-section-title">
                         <svg class="section-icon"><use href="#icon-wallet"></use></svg>
-                        <span data-i18n="walletAddressTitle">Bitcoin Wallet Address</span>
+                        <span data-i18n="walletAddressTitle">Bitcoin cüzdan adresi</span>
                     </div>
                     <div class="form-group">
                         <div class="wallet-address-wrapper">
                             <input type="text" id="walletAddress" readonly value="bc1qz72xtj5yscxdldrp6k6dvejav8xsln8jp9dz6s">
-                            <button class="btn-icon-btn" id="copyAddressBtn" onclick="copyWalletAddress()" title="Copy Address">
+                            <button class="btn-icon-btn" id="copyAddressBtn" onclick="copyWalletAddress()" title="Adresi kopyala">
                                 <svg class="icon"><use href="#icon-copy"></use></svg>
                             </button>
                         </div>
-                        <small id="walletHint" data-i18n="walletHint">Your Bitcoin wallet address for receiving payments</small>
+                        <small id="walletHint" data-i18n="walletHint">Ödemeleri almak için Bitcoin cüzdan adresiniz</small>
                     </div>
                 </div>
 
@@ -146,15 +129,15 @@
                 <div class="form-section">
                     <div class="form-section-title">
                         <svg class="section-icon"><use href="#icon-email"></use></svg>
-                        <span data-i18n="contactInfoTitle">Contact Information</span>
+                        <span data-i18n="contactInfoTitle">İletişim bilgileri</span>
                     </div>
                     <div class="form-group">
-                        <label for="email" data-i18n="emailLabel">Your Email Address</label>
+                        <label for="email" data-i18n="emailLabel">E-posta adresiniz</label>
                         <div class="input-wrapper">
-                            <input type="email" id="email" placeholder="your@email.com" required>
+                            <input type="email" id="email" placeholder="ornek@eposta.com" required>
                             <div class="input-status" id="emailStatus"></div>
                         </div>
-                        <small id="emailHint" data-i18n="emailHint">We'll send payment confirmation to this email</small>
+                        <small id="emailHint" data-i18n="emailHint">Ödeme onayını bu adrese gönderiyoruz</small>
                     </div>
                 </div>
 
@@ -163,17 +146,17 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <p class="progress-text" id="progressText">Preparing payment...</p>
+                    <p class="progress-text" id="progressText">Ödeme hazırlanıyor...</p>
                 </div>
 
                     <div class="payment-cta">
                         <button class="btn btn-primary" id="payButton" onclick="createPayment('moonpay')">
                             <svg class="btn-icon"><use href="#icon-card"></use></svg>
-                            <span data-i18n="payButton">Proceed to Secure Payment</span>
+                            <span data-i18n="payButton">Güvenli ödemeye geç</span>
                         </button>
                         <p class="payment-guarantee">
                             <svg class="guarantee-icon"><use href="#icon-shield"></use></svg>
-                            <span data-i18n="paymentGuarantee">Your payment is protected by industry-leading security</span>
+                            <span data-i18n="paymentGuarantee">Ödemeniz sektör lideri güvenlik ile korunur</span>
                         </p>
                     </div>
                 </div>
@@ -192,7 +175,7 @@
                     <span></span>
                     <span></span>
                 </div>
-                <p id="loadingText">Processing payment...</p>
+                <p id="loadingText">Ödeme işleniyor...</p>
             </div>
         </div>
 
@@ -200,7 +183,7 @@
         <div class="modal-overlay" id="paymentResult" style="display: none;">
             <div class="modal-content">
                 <div class="result-content" id="resultContent"></div>
-                <button class="btn btn-secondary" onclick="resetForm()">New Payment</button>
+                <button class="btn btn-secondary" onclick="resetForm()">Yeni ödeme</button>
             </div>
         </div>
     </div>

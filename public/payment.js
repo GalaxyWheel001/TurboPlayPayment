@@ -32,6 +32,13 @@ function initTelegramWebApp() {
     }
 }
 
+function enforceDarkTheme() {
+    const html = document.documentElement;
+    const body = document.body;
+    html.setAttribute('data-theme', 'dark');
+    body.classList.add('dark-theme-active');
+}
+
 // Инициализация при загрузке
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTelegramWebApp);
@@ -135,79 +142,13 @@ function initializePaymentPage() {
     }
     
     // Настройка селектора языка - используем делегирование событий для Telegram Mini App
-    function setupLanguageSelector() {
-        const languageSelector = document.getElementById('languageSelector');
-        if (!languageSelector) {
-            console.warn('Language selector not found');
-            return;
-        }
-        
-        console.log('Setting up language selector');
-        
-        // Автоопределение языка из Telegram или сохраненный выбор
-        const savedLang = localStorage.getItem('selectedLanguage') || localStorage.getItem('paymentLanguage');
-        const userLang = user.language_code?.split('-')[0] || 'en';
-        const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
-        const detectedLang = langMap[userLang] || 'en';
-        const currentLang = savedLang || getCurrentLanguage() || detectedLang;
-        languageSelector.value = currentLang;
-        setLanguage(currentLang);
-        
-        // Функция для обработки изменения языка
-        const handleLanguageChange = function(e) {
-            const lang = e.target ? e.target.value : e;
-            console.log('Language selector changed to:', lang);
-            setLanguage(lang);
-            localStorage.setItem('selectedLanguage', lang);
-            localStorage.setItem('paymentLanguage', lang);
-            
-            // Haptic feedback в Telegram Mini App
-            if (tg && tg.HapticFeedback) {
-                try {
-                    tg.HapticFeedback.impactOccurred('light');
-                } catch (err) {
-                    console.warn('Haptic feedback failed:', err);
-                }
-            }
-        };
-        
-        // Удаляем все старые обработчики
-        const newSelector = languageSelector.cloneNode(true);
-        languageSelector.parentNode.replaceChild(newSelector, languageSelector);
-        
-        // Получаем новый элемент
-        const selector = document.getElementById('languageSelector');
-        if (!selector) {
-            console.error('Language selector not found after recreation');
-            return;
-        }
-        
-        // Добавляем обработчики с использованием capture для Telegram Mini App
-        selector.addEventListener('change', handleLanguageChange, true);
-        selector.addEventListener('input', handleLanguageChange, true);
-        selector.addEventListener('click', function(e) {
-            console.log('Language selector clicked');
-        }, true);
-        
-        // Также добавляем onchange как запасной вариант
-        selector.setAttribute('onchange', 'if (typeof window.setLanguage === "function") { const lang = this.value; window.setLanguage(lang); localStorage.setItem("selectedLanguage", lang); localStorage.setItem("paymentLanguage", lang); console.log("Language changed via onchange:", lang); }');
-        
-        // Делегирование событий на родительском элементе
-        const parent = selector.parentElement;
-        if (parent) {
-            parent.addEventListener('change', function(e) {
-                if (e.target && e.target.id === 'languageSelector') {
-                    console.log('Language changed via delegated handler');
-                    handleLanguageChange(e);
-                }
-            }, true);
-        }
-        
-        console.log('Language selector setup complete');
+    if (typeof window.setLanguage === 'function') {
+        window.setLanguage('tr');
+    } else if (typeof setLanguage === 'function') {
+        setLanguage('tr');
+    } else {
+        updateTranslations();
     }
-    
-    // Инициализируем с задержкой для Telegram Mini App
-    setTimeout(setupLanguageSelector, 300);
 
     // Обновить переводы
     updateTranslations();
@@ -228,17 +169,8 @@ function initializePaymentPage() {
     }
     
     // Setup Dark Mode - должен быть вызван первым
-    setupDarkMode();
+    enforceDarkTheme();
     
-    // Установить тему Telegram только если темная тема не активна
-    if (tg && tg.themeParams) {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        if (currentTheme !== 'dark') {
-            // Применить тему Telegram только для светлой темы
-            document.body.style.backgroundColor = tg.themeParams.bg_color || '#ffffff';
-            document.body.style.color = tg.themeParams.text_color || '#000000';
-        }
-    }
 }
 
 // Инициализация при загрузке DOM
@@ -285,37 +217,37 @@ async function createPayment(providerName = 'moonpay') {
 
     // Валидация
     if (!email) {
-        showToast(t('emailRequired') || 'Please enter your email address', 'warning');
+        showToast(t('emailRequired') || 'Lütfen e-posta adresinizi girin.', 'warning');
         return;
     }
     
     // Email validation
     if (!validateEmail(email)) {
-        showToast(t('emailInvalid') || 'Please enter a valid email address', 'error');
+        showToast(t('emailInvalid') || 'Lütfen geçerli bir e-posta adresi girin.', 'error');
         document.getElementById('email').focus();
         return;
     }
 
     // Валидация Bitcoin адреса
     if (!validateBitcoinAddress(walletAddress)) {
-        showToast(t('walletInvalid') || 'Invalid Bitcoin wallet address', 'error');
+        showToast(t('walletInvalid') || 'Geçersiz Bitcoin cüzdan adresi.', 'error');
         return;
     }
 
     // Показать прогресс-бар
-    showProgress(0, 'Validating data...');
+    showProgress(0, 'Veriler kontrol ediliyor...');
 
     try {
         // Шаг 1: Валидация данных
         await delay(500);
-        showProgress(25, 'Creating payment...');
+        showProgress(25, 'Ödeme oluşturuluyor...');
 
         // Создать callback URL
         const userId = user.id || '';
         const callbackUrl = `${API_BASE_URL}/api/callback?user_id=${userId}`;
 
         // Шаг 2: Отправка запроса
-        showProgress(50, 'Sending request...');
+        showProgress(50, 'İstek gönderiliyor...');
         
         const apiUrl = getApiPath('create-payment');
         console.log('Creating payment with URL:', apiUrl); // Debug
@@ -337,7 +269,7 @@ async function createPayment(providerName = 'moonpay') {
             })
         });
 
-        showProgress(75, 'Processing response...');
+        showProgress(75, 'Yanıt işleniyor...');
 
         // Проверить статус ответа
         if (!response.ok) {
@@ -350,12 +282,12 @@ async function createPayment(providerName = 'moonpay') {
         console.log('Payment response:', data); // Debug
 
         if (data.success && data.paymentUrl) {
-            showProgress(100, 'Payment created!');
+            showProgress(100, 'Ödeme oluşturuldu!');
             await delay(500);
             hideProgress();
             
             // Показываем только уведомление, модальное окно показывается только после успешной оплаты
-            showToast(t('paymentCreated') || 'Payment created successfully!', 'success');
+            showToast(t('paymentCreated') || 'Ödeme başarıyla oluşturuldu!', 'success');
             
             // Проверяем наличие paymentUrl
             console.log('Payment URL received:', data.paymentUrl);
@@ -380,7 +312,7 @@ async function createPayment(providerName = 'moonpay') {
             }
         } else {
             hideProgress();
-            const errorMsg = data.error || (data.success ? 'Payment URL not received' : t('failedToCreate'));
+            const errorMsg = data.error || (data.success ? 'Ödeme bağlantısı alınamadı' : t('failedToCreate'));
             console.error('Payment creation failed:', errorMsg, data);
             showError(errorMsg);
         }
@@ -412,7 +344,7 @@ function delay(ms) {
 
 
 // Показать загрузку
-function showLoading(text = 'Processing payment...') {
+function showLoading(text = 'Ödeme işleniyor...') {
     const loading = document.getElementById('loading');
     const loadingText = document.getElementById('loadingText');
     if (loadingText) loadingText.textContent = text;
@@ -458,34 +390,34 @@ function showPaymentSuccess(data) {
     
     resultContent.innerHTML = `
         <div class="success-icon">✅</div>
-        <h3>${escapeHtml(t('paymentSuccessful') || 'Payment Successful!')}</h3>
+        <h3>${escapeHtml(t('paymentSuccessful') || 'Ödeme başarıyla tamamlandı!')}</h3>
         <div class="result-details">
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('amount') || 'Amount')}:</span>
+                <span class="result-label">${escapeHtml(t('amount') || 'Tutar')}:</span>
                 <span class="result-value">${escapeHtml(formatAmount(PAYMENT_CONFIG.amount, PAYMENT_CONFIG.currency))}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('provider') || 'Provider')}:</span>
+                <span class="result-label">${escapeHtml(t('provider') || 'Sağlayıcı')}:</span>
                 <span class="result-value">${escapeHtml(providerValue)}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('email') || 'Email')}:</span>
+                <span class="result-label">${escapeHtml(t('email') || 'E-posta')}:</span>
                 <span class="result-value">${escapeHtml(emailValue)}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('networkLabel') || 'Network')}:</span>
+                <span class="result-label">${escapeHtml(t('networkLabel') || 'Ağ')}:</span>
                 <span class="result-value">Bitcoin (BTC)</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('finalWallet') || 'Wallet Address')}:</span>
+                <span class="result-label">${escapeHtml(t('finalWallet') || 'Cüzdan adresi')}:</span>
                 <span class="result-value wallet-address">${escapeHtml(PAYMENT_CONFIG.walletAddress)}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('paymentId') || 'Payment ID')}:</span>
+                <span class="result-label">${escapeHtml(t('paymentId') || 'Ödeme kimliği')}:</span>
                 <span class="result-value">${escapeHtml(data.paymentId)}</span>
             </div>
         </div>
-        <p class="result-message">${escapeHtml(t('paymentCompleted') || 'Your payment has been successfully completed!')}</p>
+        <p class="result-message">${escapeHtml(t('paymentCompleted') || 'Ödemeniz başarıyla tamamlandı!')}</p>
     `;
     
     modal.style.display = 'flex';
@@ -518,23 +450,23 @@ function showPaymentFailure(data) {
 
     resultContent.innerHTML = `
         <div class="error-icon">⚠️</div>
-        <h3>${escapeHtml(t('paymentFailed') || 'Payment not completed')}</h3>
+        <h3>${escapeHtml(t('paymentFailed') || 'Ödeme tamamlanmadı')}</h3>
         <div class="result-details">
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('status') || 'Status')}:</span>
+                <span class="result-label">${escapeHtml(t('status') || 'Durum')}:</span>
                 <span class="result-value">${escapeHtml(statusText)}${errorDetail}</span>
             </div>
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('email') || 'Email')}:</span>
+                <span class="result-label">${escapeHtml(t('email') || 'E-posta')}:</span>
                 <span class="result-value">${escapeHtml(emailValue)}</span>
             </div>
             ${data.paymentId ? `
             <div class="result-row">
-                <span class="result-label">${escapeHtml(t('paymentId') || 'Payment ID')}:</span>
+                <span class="result-label">${escapeHtml(t('paymentId') || 'Ödeme kimliği')}:</span>
                 <span class="result-value">${escapeHtml(data.paymentId)}</span>
             </div>` : ''}
         </div>
-        <p class="result-message">${escapeHtml(t('paymentFailedMessage') || 'The payment was not completed. You can try again or choose another payment method.')}</p>
+        <p class="result-message">${escapeHtml(t('paymentFailedMessage') || 'Ödeme tamamlanmadı. Tekrar deneyebilir veya başka bir yöntem seçebilirsiniz.')}</p>
     `;
 
     modal.style.display = 'flex';
@@ -683,7 +615,7 @@ async function copyWalletAddress() {
         }
     } catch (err) {
         console.error('Failed to copy:', err);
-        showToast(t('copyFailed') || 'Failed to copy address', 'error');
+        showToast(t('copyFailed') || 'Adres kopyalanamadı.', 'error');
     }
 }
 
@@ -734,7 +666,7 @@ function openPaymentLink(url) {
     // Проверка на валидность URL
     if (!url || typeof url !== 'string') {
         console.error('Invalid payment URL:', url);
-        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        showError(t('invalidPaymentUrl') || 'Geçersiz ödeme bağlantısı.');
         return;
     }
     
@@ -743,7 +675,7 @@ function openPaymentLink(url) {
         new URL(url);
     } catch (e) {
         console.error('Invalid URL format:', url);
-        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        showError(t('invalidPaymentUrl') || 'Geçersiz ödeme bağlantısı.');
         return;
     }
     
@@ -879,7 +811,7 @@ function tryMainButtonOrModal(url) {
     // Способ 3: Использовать MainButton от Telegram (если доступно)
     if (tg && tg.MainButton && typeof tg.MainButton.show === 'function') {
         try {
-            tg.MainButton.setText(t('openPaymentLink') || 'Open Payment Link');
+            tg.MainButton.setText(t('openPaymentLink') || 'Ödeme bağlantısını aç');
             tg.MainButton.show();
             tg.MainButton.onClick(() => {
                 try {
@@ -931,13 +863,13 @@ function showPaymentLinkModal(url) {
     // Создаем элементы безопасно
     resultContent.innerHTML = `
         <div class="success-icon">🔗</div>
-        <h3>${escapeHtml(t('paymentLinkReady') || 'Payment Link Ready')}</h3>
-        <p class="result-message">${escapeHtml(t('clickToOpenPayment') || 'Click the button below to open the payment page')}</p>
+        <h3>${escapeHtml(t('paymentLinkReady') || 'Ödeme bağlantısı hazır')}</h3>
+        <p class="result-message">${escapeHtml(t('clickToOpenPayment') || 'Ödeme sayfasını açmak için aşağıdaki butona dokunun')}</p>
         <button class="btn btn-primary" id="openPaymentLinkBtn" type="button" style="margin-top: 20px; width: 100%;">
-            ${escapeHtml(t('openPaymentPage') || 'Open Payment Page')}
+            ${escapeHtml(t('openPaymentPage') || 'Ödeme sayfasını aç')}
         </button>
         <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
-            ${escapeHtml(t('orCopyLink') || 'Or copy this link:')}
+            ${escapeHtml(t('orCopyLink') || 'Ya da bağlantıyı kopyalayın:')}
         </p>
         <input type="text" id="paymentLinkInput" value="${escapeHtml(url)}" readonly style="width: 100%; padding: 8px; margin-top: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 12px;" onclick="this.select();">
     `;
@@ -1037,7 +969,7 @@ function openLinkDirect(url) {
     // Проверка URL
     if (!url || typeof url !== 'string') {
         console.error('Invalid URL in openLinkDirect:', url);
-        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        showError(t('invalidPaymentUrl') || 'Geçersiz ödeme bağlantısı.');
         return;
     }
     
@@ -1047,7 +979,7 @@ function openLinkDirect(url) {
         console.log('URL is valid');
     } catch (e) {
         console.error('Invalid URL format:', url, e);
-        showError(t('invalidPaymentUrl') || 'Invalid payment URL');
+        showError(t('invalidPaymentUrl') || 'Geçersiz ödeme bağlantısı.');
         return;
     }
     
@@ -1133,200 +1065,12 @@ function tryOtherMethods(url) {
         console.log('Redirected via location.href');
     } catch (e) {
         console.error('location.href failed:', e);
-        showToast(t('pleaseOpenLink') || 'Please open the link manually', 'warning', 5000);
+        showToast(t('pleaseOpenLink') || 'Lütfen bağlantıyı manuel olarak açın.', 'warning', 5000);
     }
 }
 
 // Экспортируем функцию для использования в onclick атрибутах
 window.openLinkDirect = openLinkDirect;
-
-// ============================================
-// DARK MODE SUPPORT
-// ============================================
-
-// Setup Dark Mode
-function setupDarkMode() {
-    function setupThemeToggle() {
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const html = document.documentElement;
-        
-        console.log('Setting up dark mode, themeToggle found:', !!themeToggle);
-        
-        // Get saved theme or detect system preference
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-        
-        // Apply theme
-        applyTheme(theme);
-        
-        // Theme toggle handler - улучшенная версия для Telegram Mini App
-        if (!themeToggle) {
-            console.warn('Theme toggle not found');
-            return;
-        }
-        
-        // Функция для переключения темы
-        const toggleTheme = () => {
-            const currentTheme = html.getAttribute('data-theme') || 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            console.log('Toggling theme from', currentTheme, 'to', newTheme);
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-            
-            // Haptic feedback в Telegram Mini App
-            if (tg && tg.HapticFeedback) {
-                try {
-                    tg.HapticFeedback.impactOccurred('light');
-                } catch (e) {
-                    console.warn('Haptic feedback failed:', e);
-                }
-            }
-        };
-        
-        // Удаляем все старые обработчики
-        const newToggle = themeToggle.cloneNode(true);
-        themeToggle.parentNode.replaceChild(newToggle, themeToggle);
-        
-        // Получаем новый элемент
-        const toggle = document.getElementById('themeToggle');
-        if (!toggle) {
-            console.error('Theme toggle not found after recreation');
-            return;
-        }
-        
-        console.log('Theme toggle recreated, setting up handlers');
-        
-        // Универсальный обработчик click с capture для Telegram Mini App
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('Theme toggle clicked');
-            toggleTheme();
-        }, true);
-        
-        // Обработчик для touch событий (для Telegram Mini App)
-        let touchStartTime = 0;
-        let touchMoved = false;
-        
-        toggle.addEventListener('touchstart', function(e) {
-            touchStartTime = Date.now();
-            touchMoved = false;
-            toggle.classList.add('active');
-            console.log('Theme toggle touch start');
-        }, { passive: true, capture: true });
-        
-        toggle.addEventListener('touchmove', function() {
-            touchMoved = true;
-        }, { passive: true, capture: true });
-        
-        toggle.addEventListener('touchend', function(e) {
-            const touchDuration = Date.now() - touchStartTime;
-            toggle.classList.remove('active');
-            
-            // Если касание было коротким и без движения (не свайп), переключаем тему
-            if (!touchMoved && touchDuration < 300) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Theme toggle touch end (short tap)');
-                toggleTheme();
-            }
-        }, { passive: false, capture: true });
-        
-        toggle.addEventListener('touchcancel', function() {
-            toggle.classList.remove('active');
-            touchMoved = false;
-        }, { capture: true });
-        
-        // Также добавляем onclick атрибут как запасной вариант
-        toggle.setAttribute('onclick', 'if (typeof window.applyTheme === "function") { const html = document.documentElement; const currentTheme = html.getAttribute("data-theme") || "light"; const newTheme = currentTheme === "dark" ? "light" : "dark"; window.applyTheme(newTheme); localStorage.setItem("theme", newTheme); console.log("Theme changed via onclick:", newTheme); }');
-        
-        // Делаем кнопку явно кликабельной
-        toggle.style.pointerEvents = 'auto';
-        toggle.style.cursor = 'pointer';
-        toggle.style.touchAction = 'manipulation';
-        toggle.style.userSelect = 'none';
-        toggle.style.webkitUserSelect = 'none';
-        
-        // Делегирование событий на родительском элементе
-        const parent = toggle.parentElement;
-        if (parent) {
-            parent.addEventListener('click', function(e) {
-                if (e.target && (e.target.id === 'themeToggle' || e.target.closest('#themeToggle'))) {
-                    console.log('Theme toggle clicked via delegated handler');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    toggleTheme();
-                }
-            }, true);
-        }
-        
-        console.log('Theme toggle handlers setup complete');
-    }
-    
-    // Инициализируем с задержкой для Telegram Mini App
-    setTimeout(setupThemeToggle, 300);
-    
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('theme')) {
-            applyTheme(e.matches ? 'dark' : 'light');
-        }
-    });
-}
-
-// Apply theme
-function applyTheme(theme) {
-    const html = document.documentElement;
-    const themeIcon = document.getElementById('themeIcon');
-    const body = document.body;
-    
-    console.log('Applying theme:', theme); // Debug
-    
-    if (theme === 'dark') {
-        html.setAttribute('data-theme', 'dark');
-        // Убедиться, что стили Telegram не перезаписывают темную тему
-        body.style.backgroundColor = '';
-        body.style.color = '';
-        body.style.removeProperty('background-color');
-        body.style.removeProperty('color');
-        body.classList.add('dark-theme-active');
-        if (themeIcon) {
-            themeIcon.innerHTML = '<use href="#icon-moon"></use>';
-        }
-        // Принудительно применить стили для темной темы
-        body.setAttribute('data-theme', 'dark');
-        console.log('Dark theme applied, data-theme:', html.getAttribute('data-theme'), 'body data-theme:', body.getAttribute('data-theme')); // Debug
-    } else {
-        html.removeAttribute('data-theme');
-        body.removeAttribute('data-theme');
-        body.classList.remove('dark-theme-active');
-        // Восстановить стили Telegram для светлой темы
-        if (window.tg && window.tg.themeParams) {
-            body.style.backgroundColor = window.tg.themeParams.bg_color || '#ffffff';
-            body.style.color = window.tg.themeParams.text_color || '#000000';
-        } else {
-            body.style.backgroundColor = '#ffffff';
-            body.style.color = '#000000';
-        }
-        if (themeIcon) {
-            themeIcon.innerHTML = '<use href="#icon-theme"></use>';
-        }
-        console.log('Light theme applied'); // Debug
-    }
-    
-    // Принудительно обновить стили через requestAnimationFrame
-    requestAnimationFrame(() => {
-        if (theme === 'dark') {
-            body.style.backgroundColor = '';
-            body.style.color = '';
-        }
-    });
-}
-
-// Экспортируем функцию для использования в onclick атрибутах
-window.applyTheme = applyTheme;
 
 // ============================================
 // PROVIDER LOGOS
