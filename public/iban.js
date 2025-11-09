@@ -73,6 +73,10 @@ function parseBoolean(value, defaultValue = false) {
     return defaultValue;
 }
 
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function formatAmountValue(amount) {
     const numeric = Number(amount);
     if (Number.isNaN(numeric) || !Number.isFinite(numeric)) {
@@ -81,13 +85,13 @@ function formatAmountValue(amount) {
     return numeric.toFixed(2);
 }
 
-function formatCurrency(amount, currency = 'RUB') {
+function formatCurrency(amount, currency = 'TRY', locale) {
     const numeric = Number(amount);
     if (Number.isNaN(numeric) || !Number.isFinite(numeric)) {
         return '-';
     }
     try {
-        return new Intl.NumberFormat(undefined, {
+        return new Intl.NumberFormat(locale || undefined, {
             style: 'currency',
             currency: currency.toUpperCase(),
             minimumFractionDigits: 2,
@@ -186,6 +190,24 @@ function updateIbanTranslations() {
     const subtitleEl = document.getElementById('ibanPageSubtitle');
     const placeholderMessage = document.getElementById('ibanWidgetMessage');
 
+    const localeMap = {
+        ru: 'ru-RU',
+        tr: 'tr-TR',
+        de: 'de-DE',
+        es: 'es-ES',
+        pt: 'pt-PT',
+        en: 'en-US'
+    };
+
+    const currentLang = typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : state.params.lang;
+    if (currentLang) {
+        state.params.lang = currentLang;
+        state.params.locale = localeMap[currentLang] || state.params.locale;
+        if (!state.params.currency || state.params.currency === 'RUB') {
+            state.params.currency = currentLang === 'ru' ? 'RUB' : 'TRY';
+        }
+    }
+
     if (titleEl) titleEl.textContent = t('ibanPageTitle');
     if (subtitleEl) subtitleEl.textContent = t('ibanPageSubtitle');
     if (placeholderMessage && !state.invoice) {
@@ -202,16 +224,16 @@ function setupLanguageSelector() {
     const selector = document.getElementById('languageSelector');
     if (!selector) return;
 
+    const params = state.params || {};
     const savedLang = localStorage.getItem('paymentLanguage') || localStorage.getItem('selectedLanguage');
     const userLang = user.language_code?.split('-')[0];
     const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
     const detected = langMap[userLang] || 'en';
+
     const availableLangs = Object.keys(window.translations || {});
-    const urlParams = new URLSearchParams(window.location.search);
-    const rawUrlLang = urlParams.get('lang');
     let normalizedUrlLang = null;
-    if (rawUrlLang) {
-        const candidate = rawUrlLang.toLowerCase();
+    if (params.lang) {
+        const candidate = params.lang.toLowerCase();
         if (availableLangs.includes(candidate)) {
             normalizedUrlLang = candidate;
         } else if (langMap[candidate]) {
@@ -232,6 +254,21 @@ function setupLanguageSelector() {
         if (typeof window.setLanguage === 'function') {
             window.setLanguage(lang);
         }
+        params.lang = lang;
+        const localeMap = {
+            ru: 'ru-RU',
+            tr: 'tr-TR',
+            de: 'de-DE',
+            es: 'es-ES',
+            pt: 'pt-PT',
+            en: 'en-US'
+        };
+        params.locale = localeMap[lang] || params.locale;
+        if (lang === 'tr') {
+            params.currency = 'TRY';
+        } else if (lang === 'ru') {
+            params.currency = params.currency === 'TRY' ? 'RUB' : (params.currency || 'RUB');
+        }
         updateIbanTranslations();
 
         if (tg && tg.HapticFeedback) {
@@ -248,7 +285,28 @@ function parseQueryParams() {
     const params = new URLSearchParams(window.location.search);
     const amountParam = params.get('amount') || params.get('summ') || params.get('sum') || '2400';
     const amount = formatAmountValue(amountParam);
-    const rawCurrency = params.get('currency') || params.get('cur') || 'RUB';
+
+    const rawLang = params.get('lang') || params.get('language');
+    const langMap = { ru: 'ru', tr: 'tr', de: 'de', es: 'es', pt: 'pt', en: 'en' };
+    let normalizedLang = null;
+    if (rawLang) {
+        const candidate = rawLang.toLowerCase();
+        normalizedLang = langMap[candidate] || candidate;
+    }
+    const lang = normalizedLang || 'tr';
+    const localeMap = {
+        ru: 'ru-RU',
+        tr: 'tr-TR',
+        de: 'de-DE',
+        es: 'es-ES',
+        pt: 'pt-PT',
+        en: 'en-US'
+    };
+
+    const rawCurrency =
+        params.get('currency') ||
+        params.get('cur') ||
+        (lang === 'ru' ? 'RUB' : 'TRY');
 
     return {
         amount,
@@ -264,6 +322,8 @@ function parseQueryParams() {
         statusSearchBy: params.get('statusSearchBy') || params.get('searchBy') || 'internal',
         statusInterval: params.get('statusInterval'),
         initialStatus: params.get('status') || '',
+        lang,
+        locale: localeMap[lang],
         rawParams: params
     };
 }
@@ -388,6 +448,23 @@ function renderRequisites(data) {
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
 
+    const controlsHtml = `
+        <div class="iban-controls">
+            <div class="iban-control-field">
+                <label class="iban-control-label" for="ibanAmountInput">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</label>
+                <input type="number" inputmode="decimal" step="0.01" min="0" id="ibanAmountInput" class="iban-control-input" value="${state.params.amount ? Number(state.params.amount) : ''}">
+                <div class="iban-control-hint">${translateKey('ibanAmountHint', 'Сумма указывается в турецких лирах (TRY)')}</div>
+            </div>
+            <div class="iban-control-field">
+                <label class="iban-control-label" for="ibanEmailInput">${translateKey('ibanEmailLabel', 'Email клиента')}</label>
+                <input type="email" id="ibanEmailInput" class="iban-control-input" value="${escapeAttr(state.params.userEmail || '')}">
+            </div>
+            <div class="iban-control-actions">
+                <button class="btn btn-secondary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
+            </div>
+        </div>
+    `;
+
     const items = normalized.map((item) => {
         if (item.type === 'multiline') {
             const labelHtml = item.label
@@ -426,7 +503,8 @@ function renderInvoice() {
 
     const amountFormatted = formatCurrency(
         state.invoice.amount || state.params.amount,
-        state.params.currency || 'RUB'
+        state.params.currency || 'TRY',
+        state.params.locale
     );
 
     const requisitesHtml = renderRequisites(state.requisites);
@@ -442,6 +520,7 @@ function renderInvoice() {
 
     root.innerHTML = `
         <div class="iban-widget">
+            ${controlsHtml}
             <div class="iban-summary">
                 <div class="summary-row">
                     <span class="summary-label">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</span>
@@ -494,6 +573,39 @@ function attachEventHandlers() {
     const refreshBtn = document.getElementById('ibanRefreshRequisitesBtn');
     const copyOrderBtn = document.getElementById('ibanCopyOrderBtn');
     const statusBtn = document.getElementById('ibanCheckStatusBtn');
+    const generateBtn = document.getElementById('ibanGenerateInvoiceBtn');
+    const amountInput = document.getElementById('ibanAmountInput');
+    const emailInput = document.getElementById('ibanEmailInput');
+
+    if (generateBtn) {
+        generateBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const amountValueRaw = amountInput ? amountInput.value.trim() : '';
+            const emailValue = emailInput ? emailInput.value.trim() : '';
+
+            const formattedAmount = formatAmountValue(amountValueRaw);
+            if (!formattedAmount || Number(formattedAmount) <= 0) {
+                alert(translateKey('ibanAmountInvalid', 'Введите корректную сумму больше 0.'));
+                return;
+            }
+
+            if (emailValue && !isValidEmail(emailValue)) {
+                alert(translateKey('ibanEmailInvalid', 'Введите корректный email.'));
+                return;
+            }
+
+            state.params.amount = formattedAmount;
+            state.params.rawAmount = formattedAmount;
+            state.params.userEmail = emailValue || '';
+            state.params.currency = 'TRY';
+            state.params.orderId = `iban_${Date.now()}`;
+            state.params.userCode = state.params.userEmail || state.params.orderId;
+            state.invoice = null;
+            state.requisites = null;
+            setWidgetMessage(translateKey('ibanLoadingRequisites', 'Загрузка реквизитов...'));
+            createInvoice(true);
+        });
+    }
 
     if (openPaymentBtn) {
         openPaymentBtn.addEventListener('click', (event) => {
@@ -629,6 +741,13 @@ async function createInvoice(initial = false) {
             throw new Error(data.error || 'Failed to create invoice');
         }
 
+        if (!state.params.userEmail && body.userEmail) {
+            state.params.userEmail = body.userEmail;
+        }
+        if (!state.params.userCode && body.userCode) {
+            state.params.userCode = body.userCode;
+        }
+
         state.invoice = data.invoice;
         state.requisites = data.requisites;
         state.params.orderId = data.invoice?.orderId || state.params.orderId;
@@ -705,6 +824,13 @@ function startStatusPolling() {
 
 function bootstrapInvoiceFlow() {
     state.params = parseQueryParams();
+    state.params.currency = (state.params.currency || 'TRY').toUpperCase();
+    if (!state.params.orderId) {
+        state.params.orderId = `iban_${Date.now()}`;
+    }
+    if (!state.params.userCode) {
+        state.params.userCode = state.params.orderId;
+    }
 
     if (state.params.initialStatus) {
         state.status = { status: state.params.initialStatus };
@@ -718,6 +844,9 @@ function initIbanPage() {
     setupThemeToggle();
     setupLanguageSelector();
     updateIbanTranslations();
+    if (!state.params.currency) {
+        state.params.currency = 'TRY';
+    }
     bootstrapInvoiceFlow();
     window.requestAnimationFrame(() => document.body.classList.add('iban-ready'));
 }
