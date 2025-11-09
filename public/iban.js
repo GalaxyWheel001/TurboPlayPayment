@@ -514,6 +514,9 @@ function renderInvoice() {
 
     const controls = buildControls();
     const hasInvoice = Boolean(state.invoice);
+    const requisitesError = state.requisites?.status === 'error';
+    const canShowSummary = hasInvoice && !requisitesError;
+
     const amountValue = state.invoice?.amount || state.params.amount;
     const amountFormatted = amountValue
         ? formatCurrency(amountValue, state.params.currency || 'TRY', state.params.locale)
@@ -531,10 +534,45 @@ function renderInvoice() {
         `
         : '';
 
+    const requisitesSection = hasInvoice
+        ? `
+            <div class="iban-requisites">
+                <div class="section-heading-row">
+                    <h3 class="section-heading">${translateKey('ibanRequisitesTitle', 'Реквизиты для оплаты')}</h3>
+                    <button class="btn btn-secondary" type="button" id="ibanRefreshRequisitesBtn">
+                        ${translateKey('ibanRefreshRequisites', 'Обновить')}
+                    </button>
+                </div>
+                ${requisitesHtml}
+            </div>
+        `
+        : '';
+
+    const statusSection = hasInvoice && state.status
+        ? `
+            <div class="iban-status" id="ibanStatusCard">
+                <div class="status-label">${translateKey('ibanStatusLabel', 'Статус платежа')}</div>
+                <div class="status-value" id="ibanStatusValue"></div>
+                <div class="status-actions">
+                    <button class="btn btn-secondary" type="button" id="ibanCheckStatusBtn">
+                        ${translateKey('ibanCheckStatus', 'Проверить статус')}
+                    </button>
+                </div>
+            </div>
+        `
+        : '';
+
+    const inlineMessage = requisitesError
+        ? `<p class="iban-inline-error">${escapeHtml(state.requisites.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'))}</p>`
+        : (!hasInvoice
+            ? `<p class="iban-inline-hint">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`
+            : '');
+
     root.innerHTML = `
         <div class="iban-widget">
             ${controls}
-            ${hasInvoice ? `
+            ${inlineMessage}
+            ${canShowSummary ? `
                 <div class="iban-summary">
                     <div class="summary-row">
                         <span class="summary-label">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</span>
@@ -548,17 +586,9 @@ function renderInvoice() {
                 </div>
             ` : ''}
 
-            <div class="iban-requisites">
-                <div class="section-heading-row">
-                    <h3 class="section-heading">${translateKey('ibanRequisitesTitle', 'Реквизиты для оплаты')}</h3>
-                    <button class="btn btn-secondary" type="button" id="ibanRefreshRequisitesBtn" ${hasInvoice ? '' : 'disabled'}>
-                        ${translateKey('ibanRefreshRequisites', 'Обновить')}
-                    </button>
-                </div>
-                ${requisitesHtml}
-            </div>
+            ${requisitesSection}
 
-            ${hasInvoice ? `
+            ${canShowSummary ? `
                 <div class="iban-actions">
                     <button class="btn btn-primary" type="button" id="ibanOpenPaymentBtn">
                         ${translateKey('ibanOpenPayment', 'Перейти к оплате')}
@@ -567,22 +597,14 @@ function renderInvoice() {
                         ${translateKey('ibanCopyOrderId', 'Скопировать ID')}
                     </button>
                 </div>
-
-                <div class="iban-status" id="ibanStatusCard" hidden>
-                    <div class="status-label">${translateKey('ibanStatusLabel', 'Статус платежа')}</div>
-                    <div class="status-value" id="ibanStatusValue"></div>
-                    <div class="status-actions">
-                        <button class="btn btn-secondary" type="button" id="ibanCheckStatusBtn">
-                            ${translateKey('ibanCheckStatus', 'Проверить статус')}
-                        </button>
-                    </div>
-                </div>
             ` : ''}
+
+            ${statusSection}
         </div>
     `;
 
     attachEventHandlers();
-    if (hasInvoice) {
+    if (hasInvoice && state.status) {
         renderStatus(state.status, { silent: true });
     }
 }

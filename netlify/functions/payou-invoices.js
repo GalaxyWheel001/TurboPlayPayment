@@ -137,6 +137,12 @@ exports.handler = async (event) => {
       try {
         const requisites = await requestPaymentRequisites(payload);
         responsePayload.requisites = requisites;
+        if (requisites) {
+          const formUrl = requisites.form_url || requisites.url || requisites.formUrl;
+          if (formUrl) {
+            responsePayload.invoice.payouFormUrl = formUrl;
+          }
+        }
       } catch (error) {
         logger.error('Failed to fetch Payou requisites', error.message);
         responsePayload.requisites = {
