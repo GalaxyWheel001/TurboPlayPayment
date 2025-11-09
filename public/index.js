@@ -34,45 +34,25 @@ function initTelegramWebApp() {
 function initPreloader() {
     const preloader = document.getElementById('preloader');
     const mainContent = document.getElementById('main-content');
-    const logoImage = document.querySelector('.logo-image');
-    
-    // Logo image is already loaded in HTML (wallet234_green.png)
-    
-    // Минимальное время показа preloader (для эффекта)
-    const minShowTime = 1000;
-    const startTime = Date.now();
-    
-    function hidePreloader() {
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, minShowTime - elapsed);
-        
+    if (!preloader || !mainContent) return;
+
+    const reveal = () => {
+        mainContent.classList.remove('is-preloading');
+        mainContent.classList.add('is-ready');
+        preloader.classList.add('preloader--hidden');
+
         setTimeout(() => {
-            preloader.style.opacity = '0';
-            preloader.style.transition = 'opacity 0.5s ease-out';
-            
-            setTimeout(() => {
-                preloader.style.display = 'none';
-                mainContent.style.display = 'block';
-                setTimeout(() => {
-                    mainContent.style.opacity = '1';
-                }, 50);
-            }, 500);
-        }, remaining);
-    }
-    
-    // Ждем загрузки DOM и скриптов
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(hidePreloader, 300);
-        });
+            if (preloader && preloader.parentNode) {
+                preloader.parentNode.removeChild(preloader);
+            }
+        }, 400);
+    };
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        requestAnimationFrame(reveal);
     } else {
-        setTimeout(hidePreloader, 300);
+        document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(reveal), { once: true });
     }
-    
-    // Также скрываем после полной загрузки
-    window.addEventListener('load', () => {
-        setTimeout(hidePreloader, 100);
-    });
 }
 
 // Setup Dark Mode

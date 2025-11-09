@@ -6,6 +6,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Payment Method - Choose Your Payment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=7.0">
@@ -18,7 +20,7 @@
             <div class="logo-container">
                 <div class="logo-image">
                     <!-- Logo - используем изображение wallet234_green.png -->
-                    <img src="wallet234_green.png" alt="Logo" class="logo-img" />
+                    <img src="wallet234_green.png" alt="Logo" class="logo-img" decoding="async">
                 </div>
             </div>
             <div class="preloader-spinner"></div>
@@ -26,7 +28,7 @@
     </div>
 
     <!-- Main Content -->
-    <div id="main-content" class="main-content" style="display: none;">
+    <div id="main-content" class="main-content is-preloading">
         <!-- SVG Icons -->
         <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
             <symbol id="icon-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></symbol>
@@ -87,7 +89,7 @@
                 <div class="payment-method-card" id="cardPaymentCard">
                     <div class="payment-method-header-section">
                         <div class="payment-method-icons">
-                            <img src="moonpay.png" alt="MoonPay" class="payment-icon-image" />
+                            <img src="moonpay.png" alt="MoonPay" class="payment-icon-image" loading="lazy" decoding="async" />
                         </div>
                         <h2 id="cardPaymentTitle" class="payment-method-title">Card Payment</h2>
                         <p id="cardPaymentSubtitle" class="payment-method-subtitle">VISA / Mastercard / Apple Pay / Google Pay</p>

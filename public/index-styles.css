@@ -17,6 +17,11 @@
     transition: opacity 0.5s ease-out;
 }
 
+.preloader--hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .preloader-content {
     display: flex;
     flex-direction: column;
@@ -95,6 +100,13 @@ body {
     overflow-x: hidden;
 }
 
+@media (max-width: 768px) {
+    body::before,
+    body::after {
+        display: none;
+    }
+}
+
 body::before {
     content: '';
     position: fixed;
@@ -139,8 +151,12 @@ body::after {
     z-index: 1;
 }
 
-.main-content[style*="display: block"] {
+.main-content.is-ready {
     opacity: 1;
+}
+
+.main-content.is-preloading {
+    opacity: 0;
 }
 
 .container {

@@ -10,19 +10,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=6.4">
     <style>
-        body:not(.iban-ready) .header-icon-wrapper,
-        body:not(.iban-ready) .header-icon,
-        body:not(.iban-ready) .header-glow,
-        body:not(.iban-ready) .payment-header-section h1,
-        body:not(.iban-ready) .payment-header-section .subtitle {
-            opacity: 0;
-        }
-
-        body:not(.iban-ready) .header-icon {
-            transform: translateY(14px) scale(0.88);
-            filter: blur(6px);
-        }
-
         body.iban-ready .header-icon-wrapper,
         body.iban-ready .payment-header-section h1,
         body.iban-ready .payment-header-section .subtitle {
@@ -74,16 +61,6 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            body:not(.iban-ready) .header-icon,
-            body:not(.iban-ready) .header-icon-wrapper,
-            body:not(.iban-ready) .header-glow,
-            body:not(.iban-ready) .payment-header-section h1,
-            body:not(.iban-ready) .payment-header-section .subtitle {
-                opacity: 1;
-                transform: none;
-                filter: none;
-            }
-
             body.iban-ready .header-icon-wrapper,
             body.iban-ready .payment-header-section h1,
             body.iban-ready .payment-header-section .subtitle,
