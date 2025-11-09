@@ -280,7 +280,7 @@ function normalizeRequisites(data) {
         }];
     }
 
-    const buildMultiline = (lines) => {
+const buildMultiline = (lines) => {
         const filtered = lines.map((line) => String(line || '').trim()).filter(Boolean);
         if (!filtered.length) return [];
         return [{
@@ -312,7 +312,18 @@ function normalizeRequisites(data) {
     if (numericEntries.length && numericEntries.length === entries.length) {
         const sorted = numericEntries
             .sort((a, b) => Number(a[0]) - Number(b[0]))
-            .map(([, value]) => value);
+            .map(([, value]) => String(value || ''));
+
+        if (sorted.every((value) => value.length <= 2)) {
+            const combined = sorted.join('').trim();
+            if (combined.length) {
+                return [{
+                    type: 'message',
+                    message: combined
+                }];
+            }
+        }
+
         return buildMultiline(sorted);
     }
 
@@ -337,6 +348,10 @@ function renderRequisites(data) {
 
     if (normalized[0].type === 'error') {
         return `<p class="placeholder-text widget-error">${escapeHtml(normalized[0].message)}</p>`;
+    }
+
+    if (normalized[0].type === 'message') {
+        return `<p class="placeholder-text">${escapeHtml(normalized[0].message)}</p>`;
     }
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
