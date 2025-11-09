@@ -91,6 +91,7 @@ const requestPaymentRequisites = async (payload) => {
 
   try {
     const { data } = await axios.get(url, { timeout: 10000 });
+    logger.info('Payou requisites response', data);
     return data;
   } catch (error) {
     if (error.response) {

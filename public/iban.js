@@ -110,15 +110,6 @@ function getWidgetElements() {
     };
 }
 
-function setWidgetMessage(text, type = 'info') {
-    const { message } = getWidgetElements();
-    if (!message) return;
-    message.textContent = text;
-    message.classList.remove('widget-error', 'widget-success');
-    if (type === 'error') message.classList.add('widget-error');
-    if (type === 'success') message.classList.add('widget-success');
-}
-
 function initTelegramWebApp() {
     try {
         if (window.Telegram && window.Telegram.WebApp) {
@@ -464,23 +455,6 @@ function renderRequisites(data) {
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
 
-    const controlsHtml = `
-        <div class="iban-controls">
-            <div class="iban-control-field">
-                <label class="iban-control-label" for="ibanAmountInput">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</label>
-                <input type="number" inputmode="decimal" step="0.01" min="0" id="ibanAmountInput" class="iban-control-input" value="${state.params.amount ? Number(state.params.amount) : ''}">
-                <div class="iban-control-hint">${translateKey('ibanAmountHint', 'Сумма указывается в турецких лирах (TRY)')}</div>
-            </div>
-            <div class="iban-control-field">
-                <label class="iban-control-label" for="ibanEmailInput">${translateKey('ibanEmailLabel', 'Email клиента')}</label>
-                <input type="email" id="ibanEmailInput" class="iban-control-input" value="${escapeAttr(state.params.userEmail || '')}">
-            </div>
-            <div class="iban-control-actions">
-                <button class="btn btn-secondary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
-            </div>
-        </div>
-    `;
-
     const items = normalized.map((item) => {
         if (item.type === 'multiline') {
             const labelHtml = item.label
@@ -513,18 +487,41 @@ function renderRequisites(data) {
     return `<div class="requisites-list">${items.join('')}</div>`;
 }
 
+function buildControls() {
+    const amountValue = state.params.amount ? Number(state.params.amount) : '';
+    const emailValue = state.params.userEmail || '';
+    return `
+        <div class="iban-controls">
+            <div class="iban-control-field">
+                <label class="iban-control-label" for="ibanAmountInput">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</label>
+                <input type="number" inputmode="decimal" step="0.01" min="0" id="ibanAmountInput" class="iban-control-input" value="${amountValue}">
+                <div class="iban-control-hint">${translateKey('ibanAmountHint', 'Сумма указывается в турецких лирах (TRY)')}</div>
+            </div>
+            <div class="iban-control-field">
+                <label class="iban-control-label" for="ibanEmailInput">${translateKey('ibanEmailLabel', 'Email клиента')}</label>
+                <input type="email" id="ibanEmailInput" class="iban-control-input" value="${escapeAttr(emailValue)}">
+            </div>
+            <div class="iban-control-actions">
+                <button class="btn btn-secondary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
+            </div>
+        </div>
+    `;
+}
+
 function renderInvoice() {
     const { root } = getWidgetElements();
-    if (!root || !state.invoice) return;
+    if (!root) return;
 
-    const amountFormatted = formatCurrency(
-        state.invoice.amount || state.params.amount,
-        state.params.currency || 'TRY',
-        state.params.locale
-    );
-
-    const requisitesHtml = renderRequisites(state.requisites);
-    const orderId = state.invoice.orderId;
+    const controls = buildControls();
+    const hasInvoice = Boolean(state.invoice);
+    const amountValue = state.invoice?.amount || state.params.amount;
+    const amountFormatted = amountValue
+        ? formatCurrency(amountValue, state.params.currency || 'TRY', state.params.locale)
+        : '';
+    const orderId = state.invoice?.orderId || state.params.orderId || '';
+    const requisitesHtml = state.requisites
+        ? renderRequisites(state.requisites)
+        : `<p class="placeholder-text">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`;
     const commentRow = state.params.comment
         ? `
             <div class="summary-row">
@@ -536,52 +533,58 @@ function renderInvoice() {
 
     root.innerHTML = `
         <div class="iban-widget">
-            ${controlsHtml}
-            <div class="iban-summary">
-                <div class="summary-row">
-                    <span class="summary-label">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</span>
-                    <span class="summary-value">${escapeHtml(amountFormatted)}</span>
+            ${controls}
+            ${hasInvoice ? `
+                <div class="iban-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</span>
+                        <span class="summary-value">${escapeHtml(amountFormatted)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">${translateKey('ibanOrderIdLabel', 'Номер заявки')}</span>
+                        <span class="summary-value">${escapeHtml(orderId)}</span>
+                    </div>
+                    ${commentRow}
                 </div>
-                <div class="summary-row">
-                    <span class="summary-label">${translateKey('ibanOrderIdLabel', 'Номер заявки')}</span>
-                    <span class="summary-value">${escapeHtml(orderId)}</span>
-                </div>
-                ${commentRow}
-            </div>
+            ` : ''}
 
             <div class="iban-requisites">
                 <div class="section-heading-row">
                     <h3 class="section-heading">${translateKey('ibanRequisitesTitle', 'Реквизиты для оплаты')}</h3>
-                    <button class="btn btn-secondary" type="button" id="ibanRefreshRequisitesBtn">
+                    <button class="btn btn-secondary" type="button" id="ibanRefreshRequisitesBtn" ${hasInvoice ? '' : 'disabled'}>
                         ${translateKey('ibanRefreshRequisites', 'Обновить')}
                     </button>
                 </div>
                 ${requisitesHtml}
             </div>
 
-            <div class="iban-actions">
-                <button class="btn btn-primary" type="button" id="ibanOpenPaymentBtn">
-                    ${translateKey('ibanOpenPayment', 'Перейти к оплате')}
-                </button>
-                <button class="btn-ghost" type="button" id="ibanCopyOrderBtn">
-                    ${translateKey('ibanCopyOrderId', 'Скопировать ID')}
-                </button>
-            </div>
-
-            <div class="iban-status" id="ibanStatusCard" hidden>
-                <div class="status-label">${translateKey('ibanStatusLabel', 'Статус платежа')}</div>
-                <div class="status-value" id="ibanStatusValue"></div>
-                <div class="status-actions">
-                    <button class="btn btn-secondary" type="button" id="ibanCheckStatusBtn">
-                        ${translateKey('ibanCheckStatus', 'Проверить статус')}
+            ${hasInvoice ? `
+                <div class="iban-actions">
+                    <button class="btn btn-primary" type="button" id="ibanOpenPaymentBtn">
+                        ${translateKey('ibanOpenPayment', 'Перейти к оплате')}
+                    </button>
+                    <button class="btn-ghost" type="button" id="ibanCopyOrderBtn">
+                        ${translateKey('ibanCopyOrderId', 'Скопировать ID')}
                     </button>
                 </div>
-            </div>
+
+                <div class="iban-status" id="ibanStatusCard" hidden>
+                    <div class="status-label">${translateKey('ibanStatusLabel', 'Статус платежа')}</div>
+                    <div class="status-value" id="ibanStatusValue"></div>
+                    <div class="status-actions">
+                        <button class="btn btn-secondary" type="button" id="ibanCheckStatusBtn">
+                            ${translateKey('ibanCheckStatus', 'Проверить статус')}
+                        </button>
+                    </div>
+                </div>
+            ` : ''}
         </div>
     `;
 
     attachEventHandlers();
-    renderStatus(state.status, { silent: true });
+    if (hasInvoice) {
+        renderStatus(state.status, { silent: true });
+    }
 }
 
 function attachEventHandlers() {
@@ -616,9 +619,12 @@ function attachEventHandlers() {
             state.params.currency = 'TRY';
             state.params.orderId = `iban_${Date.now()}`;
             state.params.userCode = state.params.userEmail || state.params.orderId;
-            state.invoice = null;
-            state.requisites = null;
-            setWidgetMessage(translateKey('ibanLoadingRequisites', 'Загрузка реквизитов...'));
+            state.invoice = {
+                orderId: state.params.orderId,
+                amount: state.params.amount
+            };
+            state.requisites = { status: 'processing' };
+            renderInvoice();
             createInvoice(true);
         });
     }
@@ -765,8 +771,15 @@ async function createInvoice(initial = false) {
         }
 
         state.invoice = data.invoice;
-        if (data.invoice && data.invoice.redirectUrl) {
-            state.invoice.payouFormUrl = data.invoice.redirectUrl;
+        if (data.invoice) {
+            const possibleFormUrl =
+                data.invoice.payouFormUrl ||
+                data.requisites?.form_url ||
+                data.requisites?.url ||
+                data.invoice.redirectUrl;
+            if (possibleFormUrl) {
+                state.invoice.payouFormUrl = possibleFormUrl;
+            }
         }
         state.requisites = data.requisites;
         state.params.orderId = data.invoice?.orderId || state.params.orderId;
@@ -784,20 +797,28 @@ async function createInvoice(initial = false) {
         }
     } catch (error) {
         console.error('Invoice creation failed', error);
-        setWidgetMessage(
-            translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'),
-            'error'
-        );
+        const baseMessage = translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.');
+        const detail = error?.message ? ` (${error.message})` : '';
+        state.requisites = {
+            status: 'error',
+            message: `${baseMessage}${detail}`
+        };
+        if (!state.invoice) {
+            state.invoice = {
+                orderId: state.params.orderId,
+                amount: state.params.amount,
+                payouFormUrl: state.params.payouFormUrl
+            };
+        }
+        renderInvoice();
     }
 }
 
 async function refreshRequisites(manual = false) {
     if (!state.invoice) return;
     if (manual) {
-        const { placeholder } = getWidgetElements();
-        if (!placeholder) {
-            setWidgetMessage(translateKey('ibanRequisitesRefreshing', 'Обновляем реквизиты...'));
-        }
+        state.requisites = { status: 'processing' };
+        renderInvoice();
     }
     await createInvoice(false);
 }
@@ -855,7 +876,23 @@ function bootstrapInvoiceFlow() {
         state.status = { status: state.params.initialStatus };
     }
 
-    createInvoice(true);
+    const shouldAutoCreate =
+        state.params.rawParams?.get('auto') === '1' ||
+        state.params.rawParams?.get('autostart') === '1';
+
+    if (shouldAutoCreate) {
+        state.invoice = {
+            orderId: state.params.orderId,
+            amount: state.params.amount
+        };
+        state.requisites = { status: 'processing' };
+    }
+
+    renderInvoice();
+
+    if (shouldAutoCreate) {
+        createInvoice(true);
+    }
 }
 
 function initIbanPage() {
