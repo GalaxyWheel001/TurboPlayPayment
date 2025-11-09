@@ -203,9 +203,8 @@ function setupLanguageSelector() {
         window.setLanguage('tr');
     } else if (typeof setLanguage === 'function') {
         setLanguage('tr');
-    } else {
-        updateTranslations();
     }
+    updateTranslations();
 }
 
 // Setup Payment Method Buttons

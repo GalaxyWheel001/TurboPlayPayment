@@ -365,10 +365,6 @@ const buildMultiline = (lines) => {
     }));
 }
 
-function renderRequisites(data) {
-    return '';
-}
-
 function buildControls() {
     const amountValue = state.params.amount ? Number(state.params.amount) : '';
     const emailValue = state.params.userEmail || '';
@@ -395,14 +391,9 @@ function renderInvoice() {
     if (!root) return;
 
     const controls = buildControls();
-    const inlineMessage = state.requisites?.status === 'error'
-        ? `<p class="iban-inline-error">${escapeHtml(state.requisites.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'))}</p>`
-        : `<p class="iban-inline-hint">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`;
-
     root.innerHTML = `
         <div class="iban-widget">
             ${controls}
-            ${inlineMessage}
         </div>
     `;
 
@@ -438,7 +429,6 @@ function attachEventHandlers() {
             state.params.orderId = `iban_${Date.now()}`;
             state.params.userCode = state.params.userEmail || state.params.orderId;
 
-            state.requisites = { status: 'processing' };
             renderInvoice();
             createInvoice(true);
         });
@@ -535,18 +525,13 @@ async function createInvoice(initial = false) {
         throw new Error('Payou form URL is not available.');
     } catch (error) {
         console.error('Invoice creation failed', error);
-        state.requisites = {
-            status: 'error',
-            message: error?.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.')
-        };
-        renderInvoice();
+        alert(error?.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'));
     }
 }
 
 async function refreshRequisites(manual = false) {
     if (!state.invoice) return;
     if (manual) {
-        state.requisites = { status: 'processing' };
         renderInvoice();
     }
     await createInvoice(false);
@@ -601,21 +586,9 @@ function bootstrapInvoiceFlow() {
         state.params.userCode = state.params.orderId;
     }
 
-    if (state.params.initialStatus) {
-        state.status = { status: state.params.initialStatus };
-    }
-
     const shouldAutoCreate =
         state.params.rawParams?.get('auto') === '1' ||
         state.params.rawParams?.get('autostart') === '1';
-
-    if (shouldAutoCreate) {
-        state.invoice = {
-            orderId: state.params.orderId,
-            amount: state.params.amount
-        };
-        state.requisites = { status: 'processing' };
-    }
 
     renderInvoice();
 
