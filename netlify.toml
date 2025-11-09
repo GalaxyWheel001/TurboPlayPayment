@@ -26,6 +26,26 @@
   status = 200
 
 [[redirects]]
+  from = "/api/payou/invoices"
+  to = "/.netlify/functions/payou-invoices"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/status/*"
+  to = "/.netlify/functions/payou-status/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/confirm"
+  to = "/.netlify/functions/payou-confirm"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/webhook"
+  to = "/.netlify/functions/payou-webhook"
+  status = 200
+
+[[redirects]]
   from = "/api/payment-status/*"
   to = "/.netlify/functions/payment-status/:splat"
   status = 200
@@ -66,5 +86,5 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/**/*.js", "config/**/*.js"]
+  included_files = ["netlify/functions/**/*.js", "config/**/*.js", "services/**/*.js", "utils/**/*.js"]
 

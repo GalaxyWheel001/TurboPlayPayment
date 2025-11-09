@@ -10,6 +10,89 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
     <link rel="stylesheet" href="styles.css?v=6.4">
     <style>
+        body:not(.iban-ready) .header-icon-wrapper,
+        body:not(.iban-ready) .header-icon,
+        body:not(.iban-ready) .header-glow,
+        body:not(.iban-ready) .payment-header-section h1,
+        body:not(.iban-ready) .payment-header-section .subtitle {
+            opacity: 0;
+        }
+
+        body:not(.iban-ready) .header-icon {
+            transform: translateY(14px) scale(0.88);
+            filter: blur(6px);
+        }
+
+        body.iban-ready .header-icon-wrapper,
+        body.iban-ready .payment-header-section h1,
+        body.iban-ready .payment-header-section .subtitle {
+            animation: fadeRise 480ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        body.iban-ready .header-icon {
+            animation: logoReveal 420ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        body.iban-ready .header-glow {
+            animation: glowPulse 2.8s ease-in-out infinite 220ms;
+        }
+
+        .payment-header-section .header-icon {
+            transition: transform 280ms ease, filter 280ms ease;
+        }
+
+        .payment-header-section .header-icon-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: -26px;
+            background: radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 65%);
+            opacity: 0;
+            transform: scale(0.85);
+            transition: opacity 360ms ease, transform 360ms ease;
+            pointer-events: none;
+        }
+
+        body.iban-ready .payment-header-section .header-icon-wrapper::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes fadeRise {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes logoReveal {
+            0% { opacity: 0; transform: translateY(18px) scale(0.85); filter: blur(8px); }
+            70% { opacity: 1; transform: translateY(-4px) scale(1.02); filter: blur(0.5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.94); }
+            50% { opacity: 0.74; transform: translate(-50%, -50%) scale(1.06); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body:not(.iban-ready) .header-icon,
+            body:not(.iban-ready) .header-icon-wrapper,
+            body:not(.iban-ready) .header-glow,
+            body:not(.iban-ready) .payment-header-section h1,
+            body:not(.iban-ready) .payment-header-section .subtitle {
+                opacity: 1;
+                transform: none;
+                filter: none;
+            }
+
+            body.iban-ready .header-icon-wrapper,
+            body.iban-ready .payment-header-section h1,
+            body.iban-ready .payment-header-section .subtitle,
+            body.iban-ready .header-icon,
+            body.iban-ready .header-glow {
+                animation: none;
+            }
+        }
+
         .widget-card {
             background: var(--bg-secondary);
             border-radius: 20px;
@@ -29,10 +112,201 @@
             height: 100%;
         }
 
+        .widget-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(148, 163, 184, 0.35);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .placeholder-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .widget-error {
+            color: var(--error-color, #f87171);
+        }
+
+        .widget-success {
+            color: var(--success-color, #34d399);
+        }
+
+        .iban-widget {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .iban-summary,
+        .iban-requisites,
+        .iban-status {
+            background: var(--bg-elevated, rgba(15, 23, 42, 0.2));
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        .section-heading-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 15px;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 12px;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+            text-align: right;
+        }
+
+        .requisites-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .requisite-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.24);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .requisite-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .requisite-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .requisite-value {
+            font-size: 15px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            word-break: break-all;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .iban-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .iban-status {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .status-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .status-value[data-status="success"] {
+            color: var(--success-color, #34d399);
+        }
+
+        .status-value[data-status="cancelled"],
+        .status-value[data-status="error"] {
+            color: var(--error-color, #f87171);
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 12px;
+        }
+
         @media (max-width: 768px) {
             .widget-card {
                 padding: 24px;
                 border-radius: 18px;
+            }
+            .requisite-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .summary-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .summary-value {
+                text-align: left;
             }
         }
     </style>
@@ -73,7 +347,12 @@
         </header>
 
         <section class="widget-card" id="ibanWidgetShell">
-            <div id="ibanWidgetRoot"></div>
+            <div id="ibanWidgetRoot">
+                <div class="widget-placeholder">
+                    <div class="spinner" role="status" aria-label="Loading"></div>
+                    <p class="placeholder-text" id="ibanWidgetMessage">Загрузка реквизитов…</p>
+                </div>
+            </div>
         </section>
     </div>
 

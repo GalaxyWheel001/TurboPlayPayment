@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
+const payouRouter = require('./routes/payou');
 require('dotenv').config();
 
 const app = express();
@@ -71,6 +72,7 @@ const PROVIDERS = {
 
 // Применить rate limiting к API endpoints
 app.use('/api/', apiLimiter);
+app.use('/api/payou', payouRouter);
 
 // Получить список провайдеров
 app.get('/api/providers', (req, res) => {
