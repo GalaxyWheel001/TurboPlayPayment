@@ -417,74 +417,7 @@ const buildMultiline = (lines) => {
 }
 
 function renderRequisites(data) {
-    const normalized = normalizeRequisites(data);
-
-    const payouMessage = translateKey('ibanRequisitesPayouIframe', '');
-    if (normalized[0]?.messageKey === 'ibanRequisitesModeration' && payouMessage) {
-        const formUrl = state.invoice?.payouFormUrl || state.invoice?.redirectUrl || '';
-        return `
-            <div class="iban-message-block">
-                <p class="placeholder-text">${escapeHtml(payouMessage)}</p>
-                ${formUrl ? `<iframe class="iban-external-frame" src="${escapeAttr(formUrl)}" loading="lazy" referrerpolicy="no-referrer" title="Payou form"></iframe>` : ''}
-                ${formUrl ? `<a class="btn btn-secondary iban-open-form" href="${escapeAttr(formUrl)}" target="_blank" rel="noopener">${translateKey('ibanOpenPaymentForm', 'Открыть форму Payou')}</a>` : ''}
-            </div>
-        `;
-    }
-
-    if (!normalized.length) {
-        return `<p class="placeholder-text">${translateKey('ibanNoRequisites', 'Реквизиты недоступны. Обратитесь в поддержку.')}</p>`;
-    }
-
-    if (normalized[0].type === 'processing') {
-        return `<p class="placeholder-text">${translateKey('ibanRequisitesProcessing', 'Реквизиты формируются. Попробуйте обновить через несколько секунд.')}</p>`;
-    }
-
-    if (normalized[0].type === 'error') {
-        return `<p class="placeholder-text widget-error">${escapeHtml(normalized[0].message)}</p>`;
-    }
-
-    if (normalized[0].type === 'message') {
-        const fallback = normalized[0].message;
-        const translated = translateKey(normalized[0].messageKey || 'ibanRequisitesMessage', fallback);
-        return `
-            <div class="iban-message-block">
-                <p class="placeholder-text">${escapeHtml(translated)}</p>
-            </div>
-        `;
-    }
-
-    const copyLabel = translateKey('ibanCopy', 'Копировать');
-
-    const items = normalized.map((item) => {
-        if (item.type === 'multiline') {
-            const labelHtml = item.label
-                ? `<span class="requisite-label">${escapeHtml(item.label)}</span>`
-                : '';
-            return `
-            <div class="requisite-item">
-                <div class="requisite-main">
-                    ${labelHtml}
-                    <pre class="requisite-value requisite-value--multiline">${escapeHtml(item.value)}</pre>
-                </div>
-                <button class="btn-ghost" type="button" data-copy="${escapeAttr(item.value)}">${copyLabel}</button>
-            </div>
-        `;
-        }
-
-        const label = item.label || item.key;
-        const displayValue = escapeHtml(item.value);
-        return `
-            <div class="requisite-item">
-                <div class="requisite-main">
-                    <span class="requisite-label">${escapeHtml(label)}</span>
-                    <span class="requisite-value" data-value="${escapeAttr(value)}">${displayValue}</span>
-                </div>
-                <button class="btn-ghost" type="button" data-copy="${escapeAttr(item.value)}">${copyLabel}</button>
-            </div>
-        `;
-    });
-
-    return `<div class="requisites-list">${items.join('')}</div>`;
+    return '';
 }
 
 function buildControls() {
@@ -502,7 +435,7 @@ function buildControls() {
                 <input type="email" id="ibanEmailInput" class="iban-control-input" value="${escapeAttr(emailValue)}">
             </div>
             <div class="iban-control-actions">
-                <button class="btn btn-secondary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
+                <button class="btn btn-primary" type="button" id="ibanGenerateInvoiceBtn">${translateKey('ibanGenerateInvoice', 'Сформировать реквизиты')}</button>
             </div>
         </div>
     `;
@@ -513,107 +446,21 @@ function renderInvoice() {
     if (!root) return;
 
     const controls = buildControls();
-    const hasInvoice = Boolean(state.invoice);
-    const requisitesError = state.requisites?.status === 'error';
-    const canShowSummary = hasInvoice && !requisitesError;
-
-    const amountValue = state.invoice?.amount || state.params.amount;
-    const amountFormatted = amountValue
-        ? formatCurrency(amountValue, state.params.currency || 'TRY', state.params.locale)
-        : '';
-    const orderId = state.invoice?.orderId || state.params.orderId || '';
-    const requisitesHtml = state.requisites
-        ? renderRequisites(state.requisites)
-        : `<p class="placeholder-text">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`;
-    const commentRow = state.params.comment
-        ? `
-            <div class="summary-row">
-                <span class="summary-label">${translateKey('ibanCommentLabel', 'Назначение платежа')}</span>
-                <span class="summary-value">${escapeHtml(state.params.comment)}</span>
-            </div>
-        `
-        : '';
-
-    const requisitesSection = hasInvoice
-        ? `
-            <div class="iban-requisites">
-                <div class="section-heading-row">
-                    <h3 class="section-heading">${translateKey('ibanRequisitesTitle', 'Реквизиты для оплаты')}</h3>
-                    <button class="btn btn-secondary" type="button" id="ibanRefreshRequisitesBtn">
-                        ${translateKey('ibanRefreshRequisites', 'Обновить')}
-                    </button>
-                </div>
-                ${requisitesHtml}
-            </div>
-        `
-        : '';
-
-    const statusSection = hasInvoice && state.status
-        ? `
-            <div class="iban-status" id="ibanStatusCard">
-                <div class="status-label">${translateKey('ibanStatusLabel', 'Статус платежа')}</div>
-                <div class="status-value" id="ibanStatusValue"></div>
-                <div class="status-actions">
-                    <button class="btn btn-secondary" type="button" id="ibanCheckStatusBtn">
-                        ${translateKey('ibanCheckStatus', 'Проверить статус')}
-                    </button>
-                </div>
-            </div>
-        `
-        : '';
-
-    const inlineMessage = requisitesError
+    const inlineMessage = state.requisites?.status === 'error'
         ? `<p class="iban-inline-error">${escapeHtml(state.requisites.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.'))}</p>`
-        : (!hasInvoice
-            ? `<p class="iban-inline-hint">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`
-            : '');
+        : `<p class="iban-inline-hint">${translateKey('ibanEnterAmount', 'Введите сумму и email, чтобы получить реквизиты.')}</p>`;
 
     root.innerHTML = `
         <div class="iban-widget">
             ${controls}
             ${inlineMessage}
-            ${canShowSummary ? `
-                <div class="iban-summary">
-                    <div class="summary-row">
-                        <span class="summary-label">${translateKey('ibanAmountLabel', 'Сумма к оплате')}</span>
-                        <span class="summary-value">${escapeHtml(amountFormatted)}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span class="summary-label">${translateKey('ibanOrderIdLabel', 'Номер заявки')}</span>
-                        <span class="summary-value">${escapeHtml(orderId)}</span>
-                    </div>
-                    ${commentRow}
-                </div>
-            ` : ''}
-
-            ${requisitesSection}
-
-            ${canShowSummary ? `
-                <div class="iban-actions">
-                    <button class="btn btn-primary" type="button" id="ibanOpenPaymentBtn">
-                        ${translateKey('ibanOpenPayment', 'Перейти к оплате')}
-                    </button>
-                    <button class="btn-ghost" type="button" id="ibanCopyOrderBtn">
-                        ${translateKey('ibanCopyOrderId', 'Скопировать ID')}
-                    </button>
-                </div>
-            ` : ''}
-
-            ${statusSection}
         </div>
     `;
 
     attachEventHandlers();
-    if (hasInvoice && state.status) {
-        renderStatus(state.status, { silent: true });
-    }
 }
 
 function attachEventHandlers() {
-    const openPaymentBtn = document.getElementById('ibanOpenPaymentBtn');
-    const refreshBtn = document.getElementById('ibanRefreshRequisitesBtn');
-    const copyOrderBtn = document.getElementById('ibanCopyOrderBtn');
-    const statusBtn = document.getElementById('ibanCheckStatusBtn');
     const generateBtn = document.getElementById('ibanGenerateInvoiceBtn');
     const amountInput = document.getElementById('ibanAmountInput');
     const emailInput = document.getElementById('ibanEmailInput');
@@ -641,68 +488,12 @@ function attachEventHandlers() {
             state.params.currency = 'TRY';
             state.params.orderId = `iban_${Date.now()}`;
             state.params.userCode = state.params.userEmail || state.params.orderId;
-            state.invoice = {
-                orderId: state.params.orderId,
-                amount: state.params.amount
-            };
+
             state.requisites = { status: 'processing' };
             renderInvoice();
             createInvoice(true);
         });
     }
-
-    if (openPaymentBtn) {
-        openPaymentBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            if (state.invoice?.redirectUrl) {
-                window.open(state.invoice.redirectUrl, '_blank', 'noopener');
-            } else {
-                alert(translateKey('ibanNoPaymentUrl', 'Ссылка на страницу оплаты недоступна.'));
-            }
-        });
-    }
-
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            refreshRequisites(true);
-        });
-    }
-
-    if (copyOrderBtn) {
-        copyOrderBtn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            if (!navigator.clipboard) return;
-            try {
-                await navigator.clipboard.writeText(state.invoice?.orderId || '');
-            } catch (error) {
-                console.warn('Failed to copy order id', error);
-            }
-        });
-    }
-
-    if (statusBtn) {
-        statusBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            pollStatus(true);
-        });
-    }
-
-    document.querySelectorAll('[data-copy]').forEach((btn) => {
-        btn.addEventListener('click', async (event) => {
-            event.preventDefault();
-            const value = btn.getAttribute('data-copy') || '';
-            try {
-                await navigator.clipboard.writeText(value);
-                btn.textContent = translateKey('ibanCopied', 'Скопировано');
-                setTimeout(() => {
-                    btn.textContent = translateKey('ibanCopy', 'Копировать');
-                }, 2000);
-            } catch (error) {
-                console.warn('Copy failed', error);
-            }
-        });
-    });
 }
 
 function normalizeStatusData(statusData) {
@@ -785,53 +576,20 @@ async function createInvoice(initial = false) {
             throw new Error(data.error || 'Failed to create invoice');
         }
 
-        if (!state.params.userEmail && body.userEmail) {
-            state.params.userEmail = body.userEmail;
-        }
-        if (!state.params.userCode && body.userCode) {
-            state.params.userCode = body.userCode;
-        }
-
         state.invoice = data.invoice;
-        if (data.invoice) {
-            const possibleFormUrl =
-                data.invoice.payouFormUrl ||
-                data.requisites?.form_url ||
-                data.requisites?.url ||
-                data.invoice.redirectUrl;
-            if (possibleFormUrl) {
-                state.invoice.payouFormUrl = possibleFormUrl;
-            }
-        }
-        state.requisites = data.requisites;
-        state.params.orderId = data.invoice?.orderId || state.params.orderId;
-
-        renderInvoice();
-
-        if (state.requisites?.status === 'processing') {
-            state.requisitesTimer = setTimeout(() => refreshRequisites(false), 4000);
+        const formUrl = data.invoice?.redirectUrl || data.invoice?.payouFormUrl;
+        if (formUrl) {
+            window.location.href = formUrl;
+            return;
         }
 
-        if (state.params.trackStatus && parseBoolean(state.params.trackStatus, false)) {
-            startStatusPolling();
-        } else if (state.status) {
-            renderStatus(state.status);
-        }
+        throw new Error('Payou form URL is not available.');
     } catch (error) {
         console.error('Invoice creation failed', error);
-        const baseMessage = translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.');
-        const detail = error?.message ? ` (${error.message})` : '';
         state.requisites = {
             status: 'error',
-            message: `${baseMessage}${detail}`
+            message: error?.message || translateKey('ibanInvoiceError', 'Не удалось получить реквизиты. Попробуйте позже.')
         };
-        if (!state.invoice) {
-            state.invoice = {
-                orderId: state.params.orderId,
-                amount: state.params.amount,
-                payouFormUrl: state.params.payouFormUrl
-            };
-        }
         renderInvoice();
     }
 }
