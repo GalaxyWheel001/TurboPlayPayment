@@ -268,12 +268,30 @@ function buildInvoiceRequestBody(params, options = {}) {
 
 function normalizeRequisites(data) {
     if (!data) return [];
-    if (data.status === 'processing') return [{ key: 'processing', value: null }];
+
+    if (data.status === 'processing') {
+        return [{ type: 'processing' }];
+    }
+
     if (data.status === 'error') {
         return [{
-            key: 'error',
-            value: data.message || translateKey('ibanRequisitesError', 'Не удалось получить реквизиты')
+            type: 'error',
+            message: data.message || translateKey('ibanRequisitesError', 'Не удалось получить реквизиты')
         }];
+    }
+
+    const buildMultiline = (lines) => {
+        const filtered = lines.map((line) => String(line || '').trim()).filter(Boolean);
+        if (!filtered.length) return [];
+        return [{
+            type: 'multiline',
+            label: translateKey('ibanRequisitesDetails', 'Реквизиты'),
+            value: filtered.join('\n')
+        }];
+    };
+
+    if (Array.isArray(data)) {
+        return buildMultiline(data);
     }
 
     const entries = Object.entries(data)
@@ -286,7 +304,24 @@ function normalizeRequisites(data) {
             key !== 'success'
         ));
 
-    return entries.map(([key, value]) => ({ key, value }));
+    if (!entries.length) {
+        return [];
+    }
+
+    const numericEntries = entries.filter(([key]) => /^\d+$/.test(key));
+    if (numericEntries.length && numericEntries.length === entries.length) {
+        const sorted = numericEntries
+            .sort((a, b) => Number(a[0]) - Number(b[0]))
+            .map(([, value]) => value);
+        return buildMultiline(sorted);
+    }
+
+    return entries.map(([key, value]) => ({
+        type: 'field',
+        key,
+        label: REQUISITE_LABELS[key] || key.replace(/_/g, ' ').toUpperCase(),
+        value: String(value)
+    }));
 }
 
 function renderRequisites(data) {
@@ -296,26 +331,41 @@ function renderRequisites(data) {
         return `<p class="placeholder-text">${translateKey('ibanNoRequisites', 'Реквизиты недоступны. Обратитесь в поддержку.')}</p>`;
     }
 
-    if (normalized[0].key === 'processing') {
+    if (normalized[0].type === 'processing') {
         return `<p class="placeholder-text">${translateKey('ibanRequisitesProcessing', 'Реквизиты формируются. Попробуйте обновить через несколько секунд.')}</p>`;
     }
 
-    if (normalized[0].key === 'error') {
-        return `<p class="placeholder-text widget-error">${escapeHtml(normalized[0].value)}</p>`;
+    if (normalized[0].type === 'error') {
+        return `<p class="placeholder-text widget-error">${escapeHtml(normalized[0].message)}</p>`;
     }
 
     const copyLabel = translateKey('ibanCopy', 'Копировать');
 
-    const items = normalized.map(({ key, value }) => {
-        const label = REQUISITE_LABELS[key] || key.replace(/_/g, ' ').toUpperCase();
-        const displayValue = escapeHtml(value);
+    const items = normalized.map((item) => {
+        if (item.type === 'multiline') {
+            const labelHtml = item.label
+                ? `<span class="requisite-label">${escapeHtml(item.label)}</span>`
+                : '';
+            return `
+            <div class="requisite-item">
+                <div class="requisite-main">
+                    ${labelHtml}
+                    <pre class="requisite-value requisite-value--multiline">${escapeHtml(item.value)}</pre>
+                </div>
+                <button class="btn-ghost" type="button" data-copy="${escapeAttr(item.value)}">${copyLabel}</button>
+            </div>
+        `;
+        }
+
+        const label = item.label || item.key;
+        const displayValue = escapeHtml(item.value);
         return `
             <div class="requisite-item">
                 <div class="requisite-main">
                     <span class="requisite-label">${escapeHtml(label)}</span>
                     <span class="requisite-value" data-value="${escapeAttr(value)}">${displayValue}</span>
                 </div>
-                <button class="btn-ghost" type="button" data-copy="${escapeAttr(value)}">${copyLabel}</button>
+                <button class="btn-ghost" type="button" data-copy="${escapeAttr(item.value)}">${copyLabel}</button>
             </div>
         `;
     });
