@@ -184,9 +184,18 @@ function updateIbanTranslations() {
 
     const titleEl = document.getElementById('ibanPageTitle');
     const subtitleEl = document.getElementById('ibanPageSubtitle');
+    const placeholderMessage = document.getElementById('ibanWidgetMessage');
 
     if (titleEl) titleEl.textContent = t('ibanPageTitle');
     if (subtitleEl) subtitleEl.textContent = t('ibanPageSubtitle');
+    if (placeholderMessage && !state.invoice) {
+        placeholderMessage.textContent = translateKey('ibanLoadingRequisites', 'Загрузка реквизитов...');
+    }
+
+    if (state.invoice) {
+        renderInvoice();
+        renderStatus(state.status, { silent: !state.status });
+    }
 }
 
 function setupLanguageSelector() {
