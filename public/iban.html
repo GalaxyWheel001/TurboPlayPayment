@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>IBAN Havalesi</title>
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="styles.css?v=6.4">
+    <style>
+        body.iban-ready .header-icon-wrapper,
+        body.iban-ready .payment-header-section h1,
+        body.iban-ready .payment-header-section .subtitle {
+            animation: fadeRise 480ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+        }
+
+        body.iban-ready .header-icon {
+            animation: logoReveal 420ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+
+        body.iban-ready .header-glow {
+            animation: glowPulse 2.8s ease-in-out infinite 220ms;
+        }
+
+        .payment-header-section .header-icon {
+            transition: transform 280ms ease, filter 280ms ease;
+        }
+
+        @keyframes fadeRise {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes logoReveal {
+            0% { opacity: 0; transform: translateY(18px) scale(0.85); filter: blur(8px); }
+            70% { opacity: 1; transform: translateY(-4px) scale(1.02); filter: blur(0.5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) scale(0.94); }
+            50% { opacity: 0.74; transform: translate(-50%, -50%) scale(1.06); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body.iban-ready .header-icon-wrapper,
+            body.iban-ready .payment-header-section h1,
+            body.iban-ready .payment-header-section .subtitle,
+            body.iban-ready .header-icon,
+            body.iban-ready .header-glow {
+                animation: none;
+            }
+        }
+
+        .widget-card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #ibanWidgetRoot {
+            width: 100%;
+            height: 100%;
+        }
+
+        .widget-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid rgba(148, 163, 184, 0.35);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .placeholder-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .widget-error {
+            color: var(--error-color, #f87171);
+        }
+
+        .widget-success {
+            color: var(--success-color, #34d399);
+        }
+
+        .iban-widget {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            width: 100%;
+        }
+
+        .iban-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(15, 23, 42, 0.18);
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .iban-control-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .iban-control-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .iban-control-input {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: rgba(15, 23, 42, 0.35);
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .iban-control-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+        }
+
+        .iban-control-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .iban-control-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .iban-summary,
+        .iban-requisites,
+        .iban-status {
+            background: var(--bg-elevated, rgba(15, 23, 42, 0.2));
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        .iban-message-block {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .iban-external-frame {
+            width: 100%;
+            min-height: 420px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.18);
+        }
+
+        .iban-open-form {
+            align-self: flex-start;
+        }
+
+        .section-heading-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 15px;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-size: 12px;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+            text-align: right;
+        }
+
+        .requisites-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .requisite-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.24);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .requisite-main {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .requisite-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .requisite-value {
+            font-size: 15px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            word-break: break-all;
+            color: var(--text-primary);
+        }
+
+        .requisite-value--multiline {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .btn-ghost {
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 6px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .iban-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .iban-status {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .status-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .status-value[data-status="success"] {
+            color: var(--success-color, #34d399);
+        }
+
+        .status-value[data-status="cancelled"],
+        .status-value[data-status="error"] {
+            color: var(--error-color, #f87171);
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .widget-card {
+                padding: 24px;
+                border-radius: 18px;
+            }
+            .iban-control-actions {
+                justify-content: stretch;
+            }
+            .iban-control-actions .btn {
+                width: 100%;
+            }
+            .requisite-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .summary-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .summary-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme-active">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="icon-iban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="5" x2="7" y2="19"/><path d="M10 14l2-2 2 2 2-2"/></symbol>
+        <symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+        <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+        <symbol id="icon-theme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+        <symbol id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+    </svg>
+
+    <div class="container" id="ibanContainer">
+        <header class="payment-header-section" style="margin-top: 24px;">
+            <div class="header-icon-wrapper">
+                <svg class="header-icon"><use href="#icon-iban"></use></svg>
+                <div class="header-glow"></div>
+            </div>
+            <h1 id="ibanPageTitle">IBAN Havalesi</h1>
+            <p class="subtitle" id="ibanPageSubtitle">Güvenli havale için aşağıdaki bilgileri kullanın.</p>
+        </header>
+
+        <section class="widget-card" id="ibanWidgetShell">
+            <div id="ibanWidgetRoot">
+                <div class="widget-placeholder">
+                    <div class="spinner" role="status" aria-label="Loading"></div>
+                    <p class="placeholder-text" id="ibanWidgetMessage">Ödeme bilgileri yükleniyor...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="iban.js"></script>
+</body>
+</html>
+
