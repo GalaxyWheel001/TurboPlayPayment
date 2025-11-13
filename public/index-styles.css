@@ -12,26 +12,6 @@ body {
     body::after {
         display: none;
     }
-    
-    /* Optimize animations on mobile for better performance */
-    .payment-method-card {
-        animation-duration: 0.3s !important;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
-    }
-    
-    .payment-method-button {
-        transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease !important;
-    }
-    
-    .payment-method-button::before,
-    .payment-method-button::after {
-        display: none;
-    }
-    
-    /* Disable backdrop-filter on mobile for better performance */
-    .payment-method-card {
-        backdrop-filter: none;
-    }
 }
 
 body::before {
@@ -46,7 +26,6 @@ body::before {
     pointer-events: none;
     z-index: 0;
     animation: float 20s ease-in-out infinite;
-    will-change: transform;
 }
 
 body::after {
@@ -61,7 +40,6 @@ body::after {
     pointer-events: none;
     z-index: 0;
     animation: float 15s ease-in-out infinite reverse;
-    will-change: transform;
 }
 
 @keyframes float {
@@ -77,10 +55,6 @@ body::after {
     opacity: 1;
     position: relative;
     z-index: 1;
-}
-
-.main-content.is-ready {
-    opacity: 1;
 }
 
 .container {
@@ -172,12 +146,11 @@ body::after {
     border: 2px solid var(--border-color);
     border-radius: var(--radius-xl);
     padding: var(--spacing-xl);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    transition: all var(--transition-slow);
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
-    will-change: transform;
 }
 
 .payment-method-card::before {
@@ -206,24 +179,20 @@ body::after {
     pointer-events: none;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .payment-method-card:hover::before,
-    .payment-method-card:hover::after {
-        opacity: 1;
-    }
-}
-
+.payment-method-card:hover::before,
 .payment-method-card:active::before {
     opacity: 1;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .payment-method-card:hover {
-        border-color: var(--primary);
-        box-shadow: var(--shadow-xl), 0 0 0 1px rgba(37, 99, 235, 0.1);
-        transform: translateY(-4px) scale(1.01);
-        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    }
+.payment-method-card:hover::after {
+    opacity: 1;
+}
+
+.payment-method-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-xl), 0 0 0 1px rgba(37, 99, 235, 0.1);
+    transform: translateY(-4px) scale(1.01);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
 .payment-method-card:active {
@@ -322,10 +291,8 @@ body::after {
     transition: all var(--transition-base);
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .payment-method-card:hover .payment-icon {
-        animation: iconFloat 2s ease-in-out infinite;
-    }
+.payment-method-card:hover .payment-icon {
+    animation: iconFloat 2s ease-in-out infinite;
 }
 
 @keyframes iconFloat {
@@ -386,15 +353,12 @@ body.dark-theme-active .payment-icon.apple-icon {
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-md);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+    transition: all var(--transition-slow);
     box-shadow: var(--shadow-primary), 0 4px 14px 0 rgba(37, 99, 235, 0.39);
     position: relative;
     overflow: hidden;
     letter-spacing: 0.01em;
     text-transform: none;
-    will-change: transform;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
 }
 
 .payment-method-button::before {
@@ -421,27 +385,24 @@ body.dark-theme-active .payment-icon.apple-icon {
     transition: left 0.5s;
 }
 
-@media (hover: hover) and (pointer: fine) {
-    .payment-method-button:hover::before {
-        width: 400px;
-        height: 400px;
-    }
+.payment-method-button:hover::before {
+    width: 400px;
+    height: 400px;
+}
 
-    .payment-method-button:hover::after {
-        left: 100%;
-    }
+.payment-method-button:hover::after {
+    left: 100%;
+}
 
-    .payment-method-button:hover {
-        background: var(--primary-gradient-hover);
-        box-shadow: var(--shadow-primary-hover), 0 6px 20px 0 rgba(37, 99, 235, 0.5);
-        transform: translateY(-3px) scale(1.02);
-    }
+.payment-method-button:hover {
+    background: var(--primary-gradient-hover);
+    box-shadow: var(--shadow-primary-hover), 0 6px 20px 0 rgba(37, 99, 235, 0.5);
+    transform: translateY(-3px) scale(1.02);
 }
 
 .payment-method-button:active {
-    transform: translateY(-1px) scale(0.98);
+    transform: translateY(-1px) scale(1);
     box-shadow: var(--shadow-primary);
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .payment-method-button.active {
@@ -697,28 +658,20 @@ body.dark-theme-active .page-title {
     }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .payment-method-card {
-        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .payment-method-card:nth-child(1) {
-        animation-delay: 0.05s;
-    }
-
-    .payment-method-card:nth-child(2) {
-        animation-delay: 0.1s;
-    }
-
-    .payment-method-card:nth-child(3) {
-        animation-delay: 0.15s;
-    }
+.payment-method-card {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .payment-method-card {
-        animation: none;
-    }
+.payment-method-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.payment-method-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.payment-method-card:nth-child(3) {
+    animation-delay: 0.3s;
 }
 
 /* ============================================

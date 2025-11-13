@@ -1,0 +1,90 @@
+[build]
+  publish = "public"
+  command = "npm install"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/api/providers"
+  to = "/.netlify/functions/providers"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-payment"
+  to = "/.netlify/functions/create-payment"
+  status = 200
+
+[[redirects]]
+  from = "/api/iban-config"
+  to = "/.netlify/functions/iban-config"
+  status = 200
+
+[[redirects]]
+  from = "/api/callback"
+  to = "/.netlify/functions/callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/invoices"
+  to = "/.netlify/functions/payou-invoices"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/status/*"
+  to = "/.netlify/functions/payou-status/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/confirm"
+  to = "/.netlify/functions/payou-confirm"
+  status = 200
+
+[[redirects]]
+  from = "/api/payou/webhook"
+  to = "/.netlify/functions/payou-webhook"
+  status = 200
+
+[[redirects]]
+  from = "/api/payment-status/*"
+  to = "/.netlify/functions/payment-status/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+[[redirects]]
+  from = "/payment-success"
+  to = "/payment.html?status=success"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/payment-failed"
+  to = "/payment.html?status=failed"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/iban/success"
+  to = "/iban.html?status=success"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/iban/failure"
+  to = "/iban.html?status=failure"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["netlify/functions/**/*.js", "config/**/*.js", "services/**/*.js", "utils/**/*.js"]
+

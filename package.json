@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node server-no-intermediary.js",
     "start-direct": "node server-no-intermediary.js",
-    "dev": "nodemon server-no-intermediary.js"
+    "dev": "nodemon server-no-intermediary.js",
+    "netlify:dev": "netlify dev",
+    "netlify:deploy": "netlify deploy",
+    "netlify:deploy:prod": "netlify deploy --prod"
   },
   "keywords": [
     "telegram",

@@ -30,8 +30,6 @@ function initTelegramWebApp() {
     }
 }
 
-// Preloader removed - content loads immediately
-
 // Setup Dark Mode
 function enforceDarkTheme() {
     const html = document.documentElement;
