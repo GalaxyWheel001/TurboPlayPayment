@@ -151,6 +151,9 @@ body::after {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(10px);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .payment-method-card::before {
@@ -359,6 +362,9 @@ body.dark-theme-active .payment-icon.apple-icon {
     overflow: hidden;
     letter-spacing: 0.01em;
     text-transform: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .payment-method-button::before {

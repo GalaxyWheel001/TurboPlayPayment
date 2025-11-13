@@ -30,6 +30,96 @@ function initTelegramWebApp() {
     }
 }
 
+function resolveUrl(path) {
+    try {
+        return new URL(path, window.location.href).toString();
+    } catch (_) {
+        return path;
+    }
+}
+
+function navigateTo(path) {
+    const targetUrl = resolveUrl(path);
+
+    if (tg) {
+        if (typeof tg.openLink === 'function') {
+            try {
+                tg.openLink(targetUrl);
+                return;
+            } catch (error) {
+                console.warn('Telegram openLink failed, falling back:', error);
+            }
+        }
+
+        if (typeof tg.openTelegramLink === 'function') {
+            try {
+                tg.openTelegramLink(targetUrl);
+                return;
+            } catch (error) {
+                console.warn('openTelegramLink failed, falling back:', error);
+            }
+        }
+    }
+
+    window.location.assign(targetUrl);
+}
+
+function addNavigationHandlers(element, destination) {
+    if (!element) return;
+
+    const go = () => navigateTo(destination);
+
+    element.addEventListener('click', (event) => {
+        event.preventDefault();
+        go();
+    });
+
+    element.addEventListener('touchend', (event) => {
+        if (event.touches && event.touches.length > 0) {
+            return;
+        }
+        event.preventDefault();
+        go();
+    }, { passive: false });
+
+    element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            go();
+        }
+    });
+}
+
+function forwardCardInteractions(cardElement, buttonElement) {
+    if (!cardElement || !buttonElement) return;
+
+    const triggerButton = (event) => {
+        if (buttonElement.contains(event.target)) {
+            return;
+        }
+        event.preventDefault();
+        buttonElement.click();
+    };
+
+    cardElement.addEventListener('click', triggerButton);
+    cardElement.addEventListener('touchend', (event) => {
+        if (event.touches && event.touches.length > 0) {
+            return;
+        }
+        triggerButton(event);
+    }, { passive: false });
+
+    cardElement.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            buttonElement.click();
+        }
+    });
+
+    cardElement.setAttribute('role', 'button');
+    cardElement.setAttribute('tabindex', '0');
+}
+
 // Setup Dark Mode
 function enforceDarkTheme() {
     const html = document.documentElement;
@@ -58,23 +148,14 @@ function setupLanguageSelector() {
 function setupPaymentMethodButtons() {
     const cardButton = document.getElementById('cardPaymentButton');
     const ibanButton = document.getElementById('ibanPaymentButton');
+    const cardPaymentCard = document.getElementById('cardPaymentCard');
+    const ibanPaymentCard = document.getElementById('ibanPaymentCard');
     
     if (cardButton) {
+        cardButton.type = 'button';
         cardButton.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Card payment selected');
-            
-            // Haptic feedback
-            if (tg && tg.HapticFeedback) {
-                try {
-                    tg.HapticFeedback.impactOccurred('medium');
-                } catch (err) {
-                    console.warn('Haptic feedback failed:', err);
-                }
-            }
-            
-            // Переход на страницу оплаты картой
-            window.location.href = 'payment.html';
+            handlePaymentSelection('card');
         });
         
         // Touch события
@@ -85,24 +166,15 @@ function setupPaymentMethodButtons() {
         cardButton.addEventListener('touchend', function() {
             cardButton.classList.remove('active');
         }, { passive: true });
+
+        addNavigationHandlers(cardButton, 'payment.html');
     }
     
     if (ibanButton) {
+        ibanButton.type = 'button';
         ibanButton.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('IBAN payment selected');
-            
-            // Haptic feedback
-            if (tg && tg.HapticFeedback) {
-                try {
-                    tg.HapticFeedback.impactOccurred('medium');
-                } catch (err) {
-                    console.warn('Haptic feedback failed:', err);
-                }
-            }
-            
-            // Переход на страницу IBAN
-            window.location.href = 'iban.html';
+            handlePaymentSelection('iban');
         });
         
         // Touch события
@@ -113,6 +185,29 @@ function setupPaymentMethodButtons() {
         ibanButton.addEventListener('touchend', function() {
             ibanButton.classList.remove('active');
         }, { passive: true });
+
+        addNavigationHandlers(ibanButton, 'iban.html');
+    }
+
+    forwardCardInteractions(cardPaymentCard, cardButton);
+    forwardCardInteractions(ibanPaymentCard, ibanButton);
+}
+
+function handlePaymentSelection(method) {
+    console.log(`${method === 'card' ? 'Card' : 'IBAN'} payment selected`);
+
+    if (tg && tg.HapticFeedback) {
+        try {
+            tg.HapticFeedback.impactOccurred('medium');
+        } catch (err) {
+            console.warn('Haptic feedback failed:', err);
+        }
+    }
+
+    if (method === 'card') {
+        navigateTo('payment.html');
+    } else if (method === 'iban') {
+        navigateTo('iban.html');
     }
 }
 
